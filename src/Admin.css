@@ -1,0 +1,264 @@
+/* Login Container */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #f4f4f4;
+}
+.logo{
+    outline-style: solid;
+    outline-width: 1px;
+    outline-color: #870d0d;
+}
+/* Login Box */
+.login-box label {
+    display: block;  
+    text-align: left; 
+    width: 80%; 
+}
+
+.login-box {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 30%;
+    text-align: center;
+}
+.login-box p {
+    margin: 20px;
+    color: #a41d21;
+}
+/* Input Fields */
+.login-box input {
+    display: flex;
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Error Message */
+p.error {
+    color: red;
+    font-size: 14px;
+    text-align: left;
+    margin: 0;
+}
+
+/* Login Button */
+.login-box button {
+    width: 30%;
+    padding: 10px;
+    background-color: #a41d21;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.login-box button:hover {
+    background-color: #870d0d;
+}
+
+@media (max-width: 760px) {
+    .login-box {
+        width: 60%;
+        padding: 20px;
+    }
+    .login-box button{
+        width: 50%;
+    }
+}
+@media (max-width: 480px) {
+    .login-box {
+        width: 80%; /* Make form take up most of the screen */
+        padding: 20px;
+    }
+
+    .login-box input {
+        font-size: 14px; /* Slightly smaller input text */
+    }
+
+    .login-box button {
+        width: 30%;
+    }
+}
+
+.sidebar {
+    width: 250px;
+    height: auto;
+    background-color: #343a40; /* Dark background */
+    color: white;
+    padding: 15px;
+    transition: width 0.3s ease;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  /* Collapsed Sidebar */
+  .sidebar.collapsed {
+    width: 75px;
+  }
+  
+  /* Toggle Button */
+  .toggle-btn {
+    /* width: 100%; */
+    float: right;
+    padding: 10px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    font-size: 18px;
+  }
+
+  /* .toggle-btn:hover {
+    background: #6c757d;
+  } */
+
+/* Sidebar Links */
+.nav-link {
+    color: white !important;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.3s;
+    white-space: nowrap;
+  }
+  
+  .nav-link:hover {
+    background: #6c757d;
+    border-radius: 5px;
+  }
+  
+  /* Sidebar Icons */
+  .nav-link i {
+    font-size: 15px;
+    width: 30px;
+    text-align: center;
+    white-space: wrap;
+  }
+  
+  /* Hide Text When Collapsed */
+  .sidebar.collapsed .link-text {
+    display: none;
+  }
+  
+  /* Tooltip Effect for Collapsed Sidebar */
+  .sidebar.collapsed .nav-link {
+    position: relative;
+  }
+  
+  .sidebar.collapsed .nav-link:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: 70px;
+    background: #495057;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    font-size: 14px;
+  }
+  
+  .flex-column {
+    padding-top: 45px;
+    margin: 0;
+  }
+  .nav-item {
+    margin: 0;
+  }
+  
+  #usersMenu.collapse.show {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  #usersMenu.collapse.show ul {
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none;
+  }
+  #usersMenu.collapse.show ul li {
+    padding: 5px 10px !important;
+    margin: 0 !important;
+  }
+  
+  /*  Dashboard content */
+  .dashboard-container{
+    height: 100vh;
+    width: 100vh;
+  }
+  .view-officeresponse {
+    display: flex;
+    padding: 0;
+    margin: 0;
+  }
+  /* Offices Dropdown Section */
+  .offices-dropdown {
+    margin-top: 10px;
+  }
+  
+  .offices-dropdown select {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: white;
+    cursor: pointer;
+  }
+  
+  /* Dropdown Custom Styling */
+  .offices-dropdown select option {
+    font-size: 16px;
+    padding: 10px;
+  }
+  
+  /* Survey Dropdown Section */
+  .survey-dropdown {
+    margin-top: 10px;
+    width: 30%;
+    padding-left: 40px;
+  }
+  
+  .survey-dropdown select {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: white;
+    cursor: pointer;
+  }
+  
+  /* Dropdown Custom Styling */
+  .survey-dropdown select option {
+    font-size: 16px;
+    padding: 10px;
+  }
+  
+  .nav-head {
+    position: relative;
+  }
+  .view-officeresponse {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .response-data {
+    margin-top: 20px;
+  }
+  
+  select {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  

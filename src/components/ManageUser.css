@@ -1,0 +1,117 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+    /* background-color: #f0ecec; */
+  }
+.page-item {
+  padding: 5px;
+}
+.admin-container {
+    width: 100%;
+    height: 100vh;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px 20px 20px;
+    overflow: hidden; /* Ensure content does not overflow */
+  }
+  
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .form-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* Allow inputs to wrap for smaller screens */
+  }
+  
+  .form-container input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 10px; /* Add some space between inputs */
+  }
+  
+  button {
+    padding: 8px 12px;
+    border: none;
+    background:#870d0d;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  button:hover {
+    background: #680a0a;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  th, td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  th {
+    background: #870d0d;
+    color: white;
+  }
+  
+  .actions button {
+    margin-right: 5px;
+    background: #28a745;
+  }
+  
+  .actions button:hover {
+    background: #218838;
+  }
+  
+  .actions .delete-btn {
+    background: #dc3545;
+  }
+  
+  .actions .delete-btn:hover {
+    background: #c82333;
+  }
+  
+  @media (max-width: 768px) {
+    .form-container {
+      flex-direction: column; /* Stack inputs vertically on smaller screens */
+    }
+  
+    button {
+      width: 100%; /* Make button full width on small screens */
+    }
+  
+    table {
+      width: 100%;
+      font-size: 14px; /* Reduce table text size on smaller screens */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .admin-container {
+      padding: 10px; /* Reduce padding on smaller screens */
+    }
+  
+    h2 {
+      font-size: 18px; /* Adjust heading size for small screens */
+    }
+  
+    .form-container input {
+      font-size: 14px; /* Smaller font size for inputs */
+    }
+    button{
+        padding: 20px;
+    }
+  }

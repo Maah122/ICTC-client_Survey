@@ -1,0 +1,790 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;600;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+  /* background-color: #f0ecec; */
+}
+/* NAVBAR */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #870d0d;
+  padding: 10px 20px;
+  height: 60px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Logo and Banner */
+.logo-container, .logo-container1 {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 40px;
+  width: auto;
+  margin-left: 15px;
+}
+.logo1 {
+  position: absolute;
+  right:10px;
+  top:10px;
+  height: 40px;
+  width: 100px;
+  margin-left: 15px;
+}
+
+.bannerheader {
+  height: 66px;
+  width: auto;
+  margin-left: -20px;
+}
+
+/* Tablet View (450px - 768px) */
+@media (max-width: 768px) {
+  .header {
+    height: 50px;
+    padding: 8px 15px;
+  }
+
+  .next-btn {
+    position: relative !important; 
+    left: 85% !important;
+    margin-top: 20px !important;
+    background-color: #870d0d !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    font-size: 16px !important;
+    color: white !important;
+    transition: background-color 0.3sease !important;
+}
+  
+  .logo1 {
+    height: 35px;
+  }
+  
+  .bannerheader {
+    width: auto;
+    margin-left: -20px;
+    height: 57px;
+  }
+
+  .headertext p {
+    color: #000000 !important;
+    font-size: 20px !important;
+    position: absolute !important;
+    top: 69px !important;
+    left: 20px !important;
+}
+}
+
+@media(max-width:530px){
+  .headertext p {
+    color: #000000 !important;
+    font-size: 18px !important;
+    position: absolute !important;
+    top: 69px !important;
+    left: 20px !important;
+}
+.next-btn {
+  position: relative !important; 
+  left: 80% !important;
+  margin-top: 20px !important;
+  background-color: #870d0d !important;
+  border: none !important;
+  padding: 10px 20px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  color: white !important;
+  transition: background-color 0.3sease !important;
+}
+}
+
+/* Mobile View (≤449px) */
+@media (max-width: 449px) {
+  .header {
+    height: 45px;
+    padding: 5px 10px;
+  }
+  
+  .logo1 {
+    height: 30px;
+    width: auto;
+    margin-left: 10px;
+  }
+  
+  .bannerheader {
+    height: 51px;
+    width: auto;
+    margin-left: -10px;
+}
+}
+
+@media (max-width: 400px) {
+  .next-btn {
+    position: relative !important;
+    left: 75% !important;
+    margin-top: 20px !important;
+    background-color: #870d0d !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    font-size: 16px !important;
+    color: white !important;
+    transition: background-color 0.3sease !important;
+}
+}
+
+
+/* Media query for stepper container responsiveness */
+@media (max-width: 1400px) {
+  .stepper-container {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-bottom: 20px !important;
+    width: 85% !important;
+    max-width: 1290px !important;
+    position: relative !important;
+    top: 112px !important;
+
+  }
+}
+
+/* LANDING PAGE */
+.survey-container {
+  max-width: 800px;
+  margin: 20px auto;
+  background: white;
+  border-radius: 8px;
+  outline-style: solid;
+  outline-width: 1px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+/* Banner Section */
+.banner {
+  text-align: center;
+}
+
+.banner-img {
+  max-width: 100%;
+  height: auto;
+}
+
+.survey-content {
+  padding: 20px;
+  color: #333;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.survey-content h3 {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Dropdown Section */
+.survey-dropdown {
+  margin-top: 10px;
+}
+
+.survey-dropdown select {
+  width: 350%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background: white;
+  cursor: pointer;
+}
+
+/* Dropdown Custom Styling */
+.survey-dropdown select option {
+  font-size: 16px;
+  padding: 10px;
+}
+
+.next-btn{
+  position: relative;
+  left: 90%;
+  margin-top: 20px;
+  background-color:#870d0d;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+@media (max-width: 815px) {
+  
+  .survey-container {
+    position: relative;
+      width: 90%;
+      margin: 10px auto;
+  }
+
+  .survey-content {
+      padding: 15px;
+  }
+  
+}
+
+@media (max-width: 600px) {
+  
+  .survey-container {
+    position: relative;
+      width: 90%;
+      margin: 10px auto;
+  }
+
+  .survey-content {
+      padding: 15px;
+  }
+  
+}
+
+/* PER OFFICE SURVEY */
+.office-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+  background: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+/*QUESTION SECTION-------------------------*/
+
+.headertext p {
+  color: #000000;
+  font-size: 24px;
+  position: absolute;
+  top: 90px;
+  left:20px;
+}
+
+/* Survey Question Container */
+.parent-container-questions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: relative;
+  height: fit-content;
+}
+
+.survey-container-questions {
+  flex-grow: 1; /* Expands inside the parent container */
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 100px;
+  position: relative;
+  top: 14px;
+}
+
+.survey-container-questions-left,
+.survey-container-questions-right {
+  width: 40%;
+  background: white;
+  border-radius: 8px;
+  outline: 1px solid #ccc;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+/* Ensuring Parent Container Expands */
+@media (max-width: 768px) {
+  .survey-container-questions {
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .survey-container-questions-left,
+  .survey-container-questions-right {
+    width: 80%;
+  }
+}
+
+/* Instruction Section */
+.instruction-1 {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.instructions-header {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.instructions-header2 {
+  font-size: 16px;
+  font-weight: semi-bold;
+  margin-bottom: 10px;
+}
+
+.description-body {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.5;
+}
+
+
+/* Client Type Radio Buttons */
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  font-weight: 100;
+  color: #333;
+  cursor: pointer;
+}
+
+.radio-group input[type="radio"] {
+  width: 16px;
+  height: 18px;
+  accent-color: #870d0d; /* Changes radio button color */
+  cursor: pointer;
+}
+
+/* "Other" Input Field Styling */
+.other-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.other-textfield {
+  padding: 2px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 200px;
+}
+
+/* Dropdown Styling */
+.dropdown-select {
+  width: 100%;
+  padding: 3px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background: white;
+  cursor: pointer;
+}
+
+.input-full {
+  position: relative;
+  width: 100%; /* Full width */
+  max-width: 512px;
+  height: 8px;
+  padding: 2px; /* Comfortable padding */
+  border: 1px solid #ccc; /* Subtle border */
+  border-radius: 5px; /* Soft rounded corners */
+  background: white; /* Clean background */
+  outline: none; /* Remove default outline */
+  transition: border-color 0.3s ease-in-out; /* Smooth interaction effect */
+}
+
+/* Focus effect for better user experience */
+.input-full:focus {
+  border-color: #870d0d; /* Highlight border in theme color */
+  box-shadow: 0 0 5px rgba(135, 13, 13, 0.3); /* Subtle glow effect */
+}
+
+
+/*Checkbox*/
+
+.checkbox-group {
+  display: flex;
+  margin-top: 10px;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+input[type="checkbox"]:checked {
+  accent-color: #870d0d; /* Custom color for checked state */
+}
+
+
+/*Stepper Header*/
+
+
+.stepper-container {
+  display: flex;
+  justify-content: center; /* Centers the stepper horizontally */
+  align-items: center;
+  margin-bottom: 20px;
+  position: relative;
+  top: 106px;
+  width: 100%; /* Ensures the container takes full width */
+  max-width: 1290px; /* Prevents the stepper from stretching too much */
+}
+
+.stepper-wrapper {
+  display: flex;
+  justify-content: center; /* Centers the stepper inside */
+  align-items: center;
+  width: 100%;
+}
+
+.stepper-container .step {
+  text-align: center; /* Ensures labels and circles align properly */
+}
+
+.step {
+  display: flex;
+  align-items: center;
+}
+
+.step-circle {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #ccc; /* Default grey color */
+  color: white;
+  margin-right: 10px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.step-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Active step styles */
+.step-circle.active {
+  background-color: #870d0d;
+  color: white;
+}
+
+/* Connector line */
+.step-line {
+  flex-grow: 1;
+  height: 4px;
+  background-color: #ccc;
+  margin: 0 10px;
+}
+
+/* Active line */
+.step-line.active {
+  background-color: #870d0d;
+}
+
+
+
+
+
+.button-container {
+  display: flex;
+  justify-content: flex-end; /* Aligns buttons to the right */
+  align-items: center;
+  margin-top: 20px;
+  padding: 10px 40px;
+  position: relative;
+  bottom: -2px;
+}
+
+.back-button {
+  background-color: #870d0d;
+  margin-right: auto; /* Pushes the Back button to the far left */
+  margin-bottom: 50px;
+  visibility: hidden; /* Initially hides the Back button */
+  position: relative;
+  left: 35px;
+}
+
+.back-button.show {
+  visibility: visible; /* Only visible when step > 1 */
+}
+
+.next-button {
+  background-color: #870d0d;
+  margin-left: 10px; /* Adds spacing between Next and Submit */
+  margin-bottom: 50px;
+  position: relative;
+  right: 35px;
+}
+
+.submit-button {
+  background-color: #870d0d;
+  margin-left: 10px; /* Adds spacing between Next and Submit */
+  margin-bottom: 50px;
+}
+
+button {
+  padding: 12px 24px;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: background 0.3s ease, transform 0.2s ease;
+  color: #f8f9fa;
+}
+
+button:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+/* For third part survey */
+.radio-container {
+  display: flex;
+  justify-content: space-between; /* Ensures even spacing */
+  gap: 20px; /* Adds spacing between columns */
+}
+
+.radio-column {
+  display: flex;
+  flex-direction: column;
+  width: 50%; /* Makes each column take half the width */
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space between radio button and text */
+  font-size: 14px;
+}
+.additional-field {
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.input-full {
+  width: 90%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+/* For error message */
+.error-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.error-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+.error-content p {
+  padding: 20px;
+}
+.error-content button{
+  background: #870d0d;
+}
+
+
+/* Modal Styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  border: 2px solid #ccc;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Title Styling */
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+/* Modal Body with Border */
+.modal-body {
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f9f9f9;
+  margin-bottom: 16px;
+}
+
+.modal-text {
+  font-size: 1rem;
+  color: #444;
+  margin-bottom: 12px;
+  text-align: justify;
+}
+
+/* Checkbox Styling */
+.modal-checkbox1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.modal-checkbox1 input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  position: relative;
+  left: 12px;
+  bottom: 9.4px;
+}
+
+/* Buttons */
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.modal-buttons button {
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: white;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.modal-buttons .cancel-btn {
+  background: #6b7280;
+}
+
+.modal-buttons .confirm-btn {
+  background: #870d0d;
+}
+
+.modal-buttons .confirm-btn.disabled {
+  background: #b0b0b0;
+  cursor: not-allowed;
+}
+
+/* Hover Effects */
+.modal-buttons button:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ====== Responsive Adjustments for Different Devices ====== */
+
+/* Small Screens (Smartphones) */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 16px;
+    max-width: 95%;
+  }
+
+  .modal-title {
+    font-size: 1.2rem;
+  }
+
+  .modal-text {
+    font-size: 0.9rem;
+  }
+  .modal-buttons button {
+    width: 100%; /* Make buttons full width */
+  }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+  .modal-content {
+    max-width: 85%;
+  }
+  .modal-buttons button {
+    width: 100%; /* Make buttons full width */
+  }
+}
+
+/* Large Screens (PC) */
+@media (min-width: 1024px) {
+  .modal-content {
+    max-width: 450px;
+  }
+}
