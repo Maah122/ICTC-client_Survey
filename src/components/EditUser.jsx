@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../global/NavBar";
 import AdminSidebar from "../global/AdminSideBar";
 import './AddUser.css';
@@ -19,27 +19,27 @@ const officeOptions = [
   { id: 12, officeName: "MSU-IIT Center for Resiliency" },
 ];
 
+const EditUser = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = location.state || {};
 
-const AddUser = () => {
-
-  const [newUser, setNewUser] = useState({
+  const [editedUser, setEditedUser] = useState(user || {
+    id: "",
     name: "",
     email: "",
-    username: "",
     password: "",
     office: "",
   });
 
-  const [userRights, setUserRights] = useState("");
+  const [userRights, setUserRights] = useState(user?.rights || "");
   const [showModal, setShowModal] = useState(false);
-  const [selectedOffices, setSelectedOffices] = useState([]);
+  const [selectedOffices, setSelectedOffices] = useState(user?.offices || []);
   const [selectedOffice, setSelectedOffice] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const navigate = useNavigate();
-
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewUser({ ...newUser, [name]: value });
+    setEditedUser({ ...editedUser, [name]: value });
   };
 
   const handleUserRightsChange = (e) => {
@@ -59,15 +59,16 @@ const AddUser = () => {
     setSelectedOffices(selectedOffices.filter((o) => o !== office));
   };
 
-  const addUser = () => {
-    console.log("New User Added:", newUser, "Selected Offices:", selectedOffices);
-    setSuccessMessage("User Added Successfully!");
-    setTimeout(() => navigate('/manageuser'), 2000);
+  const saveUser = () => {
+    console.log("User Updated:", { ...editedUser, rights: userRights, offices: selectedOffices });
+    navigate("/manageuser");
   };
+
   const saveUserRights = () => {
-    console.log("User rights saved for selected offices:", selectedOffices);
+    console.log("User rights updated for selected offices:", selectedOffices);
     setShowModal(false);
   };
+
   return (
     <div>
       <Navbar />
@@ -76,27 +77,26 @@ const AddUser = () => {
         <div className="container">
           <div className="row">
             <div className="col-md-6 offset-md-3">
-              {successMessage && <div className="alert alert-success">{successMessage}
-                </div>}
+              <h4 className="mb-4 text-center">Edit User</h4>
               <div className="form">
-              <h4 className="mb-4 text-center">Add New User</h4>
-              <div className="form-group">
-                  <label className="label" htmlFor="name">Name</label>
+                <div className="form-group">
+                  <label htmlFor="name">Name</label>
                   <input
                     type="text"
                     name="name"
-                    value={newUser.name}
+                    value={editedUser.name}
                     onChange={handleInputChange}
                     className="form-control"
                     placeholder="Enter name"
                   />
                 </div>
+
                 <div className="form-group mt-3">
-                  <label className="label" htmlFor="email">Email</label>
+                  <label htmlFor="email">Email</label>
                   <input
                     type="email"
                     name="email"
-                    value={newUser.email}
+                    value={editedUser.email}
                     onChange={handleInputChange}
                     className="form-control"
                     placeholder="Enter email"
@@ -104,34 +104,18 @@ const AddUser = () => {
                 </div>
 
                 <div className="form-group mt-3">
-                  <label className="label" htmlFor="password">Password</label>
+                  <label htmlFor="password">Password</label>
                   <input
                     type="password"
                     name="password"
-                    value={newUser.password}
+                    value={editedUser.password}
                     onChange={handleInputChange}
                     className="form-control"
-                    placeholder="Enter password"
+                    placeholder="Enter new password"
                   />
                 </div>
-                {/* <div className="form-group mt-3">
-                  <label htmlFor="office">Select Office</label>
-                  <select
-                    name="office"
-                    value={newUser.office}
-                    onChange={handleInputChange}
-                    className="form-control"
-                  >
-                    <option value="">Select Office</option>
-                    {officeOptions.map((office) => (
-                      <option key={office.id} value={office.officeName}>
-                        {office.officeName}
-                      </option>
-                    ))}
-                  </select>
-                </div> */}
 
-                <div className="form-group mt-3">
+                {/* <div className="form-group mt-3">
                   <label>User Rights:</label>
                   <div>
                     <label>
@@ -144,7 +128,6 @@ const AddUser = () => {
                       <input type="radio" name="userRights" value="Limited" checked={userRights === "Limited"} onChange={handleUserRightsChange} /> Limited
                     </label>
                   </div>
-
                   {userRights === "Limited" && (
                     <div className="mt-3">
                       <label>Selected Offices:</label>
@@ -153,15 +136,17 @@ const AddUser = () => {
                         {selectedOffices.map((office, index) => (
                           <li key={index}>
                             {office}
-                            
+                            <i id="add-btn"className="bi bi-trash" style={{ cursor: 'pointer' }} onClick={() => removeOffice(office)}></i>
                           </li>
                         ))}
                       </ul>
                     </div>
                   )}
-                </div>
+                </div> */}
 
-                <button onClick={addUser} className="btn btn-primary mt-4 w-100">Add User</button>
+                <button onClick={saveUser} className="btn btn-success mt-4 w-100">
+                  Save Changes
+                </button>
               </div>
             </div>
           </div>
@@ -169,12 +154,11 @@ const AddUser = () => {
       </div>
 
       {showModal && (
-        <div className="modal show d-block" tabIndex="-1" >
+        <div className="modal show d-block" tabIndex="-1">
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Select Offices for Limited Access</h5>
-                <button className="btn-close" style={{ animation: 'none' }}onClick={() => setShowModal(false)}></button>
               </div>
               <div className="modal-body">
                 <select className="form-control" value={selectedOffice} onChange={(e) => setSelectedOffice(e.target.value)}>
@@ -183,20 +167,10 @@ const AddUser = () => {
                     <option key={office.id} value={office.officeName}>{office.officeName}</option>
                   ))}
                 </select>
-                <div className="mt-3">
-                <h6 className="selected-offices">Selected Offices:</h6>
-                <ul>
-                  {selectedOffices.map((office, index) => (
-                    <li className="offices" key={index}>{office}
-                    <i id="add-btn"className="bi bi-trash" style={{ cursor: 'pointer' }} onClick={() => removeOffice(office)}></i>
-                    </li>
-                  ))}
-                </ul>
-              </div>
                 <button className="btn btn-success mt-3" onClick={addOffice}>Add Office</button>
               </div>
               <div className="modal-footer">
-              <button className="btn btn-primary" onClick={saveUserRights}>Save</button>
+                <button className="btn btn-primary" onClick={saveUserRights}>Save</button>
               </div>
             </div>
           </div>
@@ -206,4 +180,4 @@ const AddUser = () => {
   );
 };
 
-export default AddUser;
+export default EditUser;

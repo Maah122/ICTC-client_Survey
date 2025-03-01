@@ -1,56 +1,91 @@
 * {
-    margin: 0;
-    padding: 0;
-    font-family: "Inter", sans-serif;
-  }
-  
-  html, body {
-    height: 100%;
-  }
-  
-  h4{
-    padding-top: 20px;
-  }
-  .container {
-    height: 100vh;
-    align-items: center;
-    padding: 0px 20px 0px 20px;
-  }
-  
-  .form-group {
-    width: 100%;
-  }
-  
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+}
+
+html, body {
+  height: 100%;
+}
+
+h4{
+  padding-top: 20px;
+}
+.container {
+  height: 100vh;
+  align-items: center;
+  padding: 0px 20px 0px 20px;
+}
+.form{
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.form-group {
+  width: 100%;
+}
+.label{
+  font-weight: bold;
+}
+#userRights {
+  display: flex;
+  gap: 20px; /*  betwe radzftttsssssfsdfsfesesessssasaszessssassio sfaadwdgssbsgdoptions */
+  align-items: center;
+  margin: 0;
+}
+#userRights p {
+  margin: 0;
+}
+#userRights label {
+  display: flex;
+  align-items: center;
+  gap: 8px; 
+  cursor: pointer;
+}
+.btn-close {
+  animation: none !important;
+}
+.modal {
+  animation: none !important;
+  transition: none !important;
+}
+#add-btn{
+  float: right;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 0px;
+}
+.modal-title{
+  font-size: 18px;
+}
+.offices{
+  text-align: left;
+}
+.btn-success{
+  float: right;
+}
+.modal-body{
+  border: none;
+  background-color: rgba(240, 248, 255, 0);
+}
+@media (max-width: 768px) {
+  .form-group input,
+  .form-group select,
   button {
-    padding: 12px 20px;
-    border: none;
-    background: #870d0d;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s ease;
+    width: 100%; /* Make inputs and button full width on small screens */
   }
-  
-  button:hover {
-    background: #680a0a;
+}
+
+@media (max-width: 480px) {
+  .form{
+      padding: 20px;
+      
   }
-  
-  @media (max-width: 768px) {
-    .form-group input,
-    .form-group select,
-    button {
-      width: 100%; /* Make inputs and button full width on small screens */
-    }
+  .form-group input,
+  .form-group select,
+  button {
+    font-size: 14px; /* Smaller font size for inputs and button*/
   }
-  
-  @media (max-width: 480px) {
-    .form{
-        padding: 20px;
-    }
-    .form-group input,
-    .form-group select,
-    button {
-      font-size: 14px; /* Smaller font size for inputs and button */
-    }
-  }
-  
+}
+
