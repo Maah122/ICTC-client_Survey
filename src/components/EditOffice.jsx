@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../global/NavBar";
+import axios from "axios";
 import AdminSidebar from "../global/AdminSideBar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -9,21 +10,25 @@ import "./AddOffice.css"; // Reusing the same CSS
 const EditOffice = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { office } = location.state || {};
+  const office = location.state?.office || null;
 
   const [officeName, setOfficeName] = useState(office?.office || "");
   const [services, setServices] = useState(office?.services || []);
-  const [personnel, setPersonnel] = useState(office?.personnel || []);
+  const [personnel, setPersonnel] = useState(office?.personnel || []);  
   const [newService, setNewService] = useState("");
   const [newPersonnel, setNewPersonnel] = useState("");
   const [editIndex, setEditIndex] = useState(null);
   const [editType, setEditType] = useState("");
 
   useEffect(() => {
-    if (!office) {
-      navigate("/manageoffice"); // Redirect if no office data is provided
+    if (office?.id) {
+        fetch(`/api/office/${office.id}/services`)
+            .then((res) => res.json())
+            .then((data) => setServices(data))
+            .catch((err) => console.error("Error fetching services:", err));
     }
-  }, [office, navigate]);
+}, [office]);
+
 
   // Add or edit service
   const handleService = () => {
@@ -70,6 +75,10 @@ const EditOffice = () => {
 
     setNewPersonnel("");
   };
+  console.log("Office Data:", office);
+console.log("Services Data:", office.services);
+console.log("Personnel Data:", office.personnel);
+
 
   // Edit existing personnel
   const editPersonnel = (index) => {
@@ -84,7 +93,7 @@ const EditOffice = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!officeName.trim()) {
@@ -92,17 +101,30 @@ const EditOffice = () => {
       return;
     }
 
-    const existingOffices = JSON.parse(localStorage.getItem("offices")) || [];
-    const updatedOffices = existingOffices.map((o) =>
-      o.id === office.id
-        ? { ...o, office: officeName, services, personnel }
-        : o
-    );
+    try {
+      if (!office?.id) {
+        alert("Invalid office data.");
+        return;
+      }
 
-    localStorage.setItem("offices", JSON.stringify(updatedOffices));
+      await axios.put(`http://localhost:5000/api/offices/${office.id}`, {
+        office: officeName,
+        services,
+        personnel,
+      });
 
-    navigate("/manageoffice");
+      console.log("Services: ", services);
+      console.log("Personnels: ", personnel)
+
+      alert("Office updated successfully!");
+      navigate("/manageoffice");
+    } catch (error) {
+      console.error("Error updating office:", error);
+      alert("Failed to update office.");
+    }
   };
+
+  
 
   return (
     <div>
@@ -140,10 +162,12 @@ const EditOffice = () => {
                   {editType === "service" ? "Update" : "+ Add"}
                 </button>
               </div>
-              <ul className="list-group mt-2">
+              <ul key="_id" className="list-group mt-2">
                 {services.map((service, index) => (
                   <li key={index} className="list-group-item d-flex justify-content-between">
-                    {service}
+                  {service.name}
+          
+                
                     <div>
                       <i className="bi bi-pencil-square text-primary me-2" style={{ cursor: "pointer" }} onClick={() => editService(index)} />
                       <i className="bi bi-trash text-danger" style={{ cursor: "pointer" }} onClick={() => removeService(index)} />
@@ -171,7 +195,7 @@ const EditOffice = () => {
               <ul className="list-group mt-2">
                 {personnel.map((person, index) => (
                   <li key={index} className="list-group-item d-flex justify-content-between">
-                    {person}
+                    {person.name}
                     <div>
                       <i className="bi bi-pencil-square text-primary me-2" style={{ cursor: "pointer" }} onClick={() => editPersonnel(index)} />
                       <i className="bi bi-trash text-danger" style={{ cursor: "pointer" }} onClick={() => removePersonnel(index)} />

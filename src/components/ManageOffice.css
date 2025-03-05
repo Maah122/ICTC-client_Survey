@@ -161,3 +161,16 @@ th {
     }
 }
 
+.empty-row {
+    height: 40px; /* Adjust row height */
+    background-color: #f9f9f9; /* Light background to maintain structure */
+  }
+
+  .scrollable-container {
+    max-height: 150px; /* Set a max height to prevent long rows */
+    overflow-y: auto;  /* Enable vertical scrolling */
+    border: 1px solid #ddd; /* Optional: Adds a border for better visibility */
+    padding: 5px;
+  }
+  
+  

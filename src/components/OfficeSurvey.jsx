@@ -50,6 +50,13 @@ const OfficeSurvey = () => {
     const [section2, setSection2] = useState(null);
 
     useEffect(() => {
+        const isPageReloaded = performance.navigation.type === 1; // Check if the page was refreshed
+        if (isPageReloaded) {
+          navigate("/clientsurvey"); // Redirect to LandingPage
+        }
+      }, [navigate]);
+
+    useEffect(() => {
         const fetchOffice = async () => {
             try {
                 const response = await axios.get(`http://localhost:5000/api/offices/${officeId}`);
