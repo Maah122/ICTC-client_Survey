@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import NavBarQuest from "../global/NavBarQuest";
 import axios from "axios";
 
@@ -9,7 +9,6 @@ const surveyQuestions3Optional = [
     { name: "email", type: "email", label: "Email address (optional):", placeholder: "Your answer" },
     { name: "contact", type: "text", label: "Mobile Number (optional):", placeholder: "Your answer" }
 ];
-
 
 const OfficeSurvey = () => {
     const { surveyId, officeId } = useParams();
@@ -48,6 +47,15 @@ const OfficeSurvey = () => {
     const [error, setError] = useState(null);
     const [section1, setSection1] = useState(null);
     const [section2, setSection2] = useState(null);
+    const location = useLocation(); // Get the current location
+
+    useEffect(() => {
+        const isPageReloaded = performance.navigation.type === 1; // Check if the page was refreshed
+        // Only redirect if the page was reloaded and we are NOT navigating from the LandingPage
+        if (isPageReloaded && location.pathname !== `/office/${officeId}/survey/${surveyId}`) {
+            navigate("/clientsurvey"); // Redirect to LandingPage
+        }
+    }, [navigate, location, officeId, surveyId]);
 
     useEffect(() => {
         const fetchOffice = async () => {
@@ -367,7 +375,7 @@ const OfficeSurvey = () => {
                     {step === 1 && (
                 <div className="survey-container-questions">
                                 {/* Left Side - Client Type with Radio Buttons */}
-                        <div className="survey-container-questions-left">
+                        <div className="survey-container-questions-left"> 
                             <div className="instruction-1">
                                 <p className="instructions-header2">Client Type:</p>
                                 <div className="radio-group">

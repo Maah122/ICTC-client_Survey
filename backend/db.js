@@ -9,6 +9,4 @@ const pool = new Pool({
     port: process.env.DB_PORT
 });
 
-pool.query('SET search_path TO "CSS";');
-
 module.exports = pool;

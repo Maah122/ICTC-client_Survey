@@ -75,28 +75,54 @@ const AddOffice = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!officeName.trim()) {
-      alert("Office name cannot be empty!");
-      return;
+        alert("Office name cannot be empty!");
+        return;
     }
 
-    const existingOffices = JSON.parse(localStorage.getItem("offices")) || [];
+    try {
+        const response = await fetch("http://localhost:5000/api/offices", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                office: officeName,
+                services: services,
+                personnel: personnel,
+            }),
+        });
 
-    const newOffice = {
-      id: existingOffices.length + 1,
-      office: officeName,
-      services,
-      personnel,
-    };
+        if (!response.ok) {
+            throw new Error("Failed to add office");
+        }
 
-    const updatedOffices = [...existingOffices, newOffice];
-    localStorage.setItem("offices", JSON.stringify(updatedOffices));
+        const result = await response.json();
+        console.log("Office created:", result);
 
-    navigate("/manageoffice");
-  };
+        
+        navigate("/manageoffice");
+    } catch (error) {
+        console.error("Error creating office:", error);
+        alert("Failed to create office");
+    }
+};
+
+const fetchData = async () => {
+    try {
+        const response = await fetch("http://localhost:5000/api/offices"); // Adjust API URL if needed
+        if (!response.ok) {
+            throw new Error("Failed to fetch office data");
+        }
+        const data = await response.json();
+        console.log("Updated office data:", data);
+    } catch (error) {
+        console.error("Error fetching office data:", error);
+    }
+};
+
+
 
   return (
     <div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../global/NavBar";
+import axios from "axios";
 import AdminSidebar from "../global/AdminSideBar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -9,21 +10,40 @@ import "./AddOffice.css"; // Reusing the same CSS
 const EditOffice = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { office } = location.state || {};
+  const office = location.state?.office || null;
 
-  const [officeName, setOfficeName] = useState(office?.office || "");
+  const [officeName, setOfficeName] = useState(office?.name || "");
   const [services, setServices] = useState(office?.services || []);
-  const [personnel, setPersonnel] = useState(office?.personnel || []);
+  const [personnel, setPersonnel] = useState(office?.personnel || []);  
   const [newService, setNewService] = useState("");
   const [newPersonnel, setNewPersonnel] = useState("");
   const [editIndex, setEditIndex] = useState(null);
   const [editType, setEditType] = useState("");
 
+  // Pagination state
+  const [currentServicePage, setCurrentServicePage] = useState(1);
+  const [servicesPerPage] = useState(5); // Number of services per page
+  const [currentPersonnelPage, setCurrentPersonnelPage] = useState(1);
+  const [personnelPerPage] = useState(5); // Number of personnel per page
+
   useEffect(() => {
-    if (!office) {
-      navigate("/manageoffice"); // Redirect if no office data is provided
+    if (office?.id) {
+      // Fetch office details (only name)
+      axios.get(`http://localhost:5000/api/offices/${office.id}`)
+        .then(res => {
+          setOfficeName(res.data.office); // Ensure the API returns { office: "Office Name" }
+        })
+        .catch(err => console.error("Error fetching office name:", err));
+  
+      // Fetch services separately
+      axios.get(`http://localhost:5000/api/office/${office.id}/services`)
+        .then(res => {
+          setServices(res.data); // Ensure API returns a list of services
+        })
+        .catch(err => console.error("Error fetching services:", err));
     }
-  }, [office, navigate]);
+  }, [office]);
+  
 
   // Add or edit service
   const handleService = () => {
@@ -31,10 +51,22 @@ const EditOffice = () => {
 
     if (editType === "service" && editIndex !== null) {
       const updatedServices = [...services];
-      updatedServices[editIndex] = newService.trim();
-      setServices(updatedServices);
-      setEditIndex(null);
-      setEditType("");
+      const serviceId = updatedServices[editIndex].id; // Get the ID of the service being edited
+
+      // Update the service in the backend
+      axios.put(`http://localhost:5000/api/offices/${office.id}/services/${serviceId}`, {
+        serviceName: newService.trim(),
+      })
+      .then(() => {
+        updatedServices[editIndex].name = newService.trim(); // Update the local state
+        setServices(updatedServices);
+        setEditIndex(null);
+        setEditType("");
+      })
+      .catch((error) => {
+        console.error("Error updating service:", error);
+        alert("Failed to update service.");
+      });
     } else {
       setServices([...services, newService.trim()]);
     }
@@ -44,14 +76,23 @@ const EditOffice = () => {
 
   // Edit existing service
   const editService = (index) => {
-    setNewService(services[index]);
+    setNewService(services[index].name); // Set the name for editing
     setEditIndex(index);
     setEditType("service");
   };
 
   // Delete service
   const removeService = (index) => {
-    setServices(services.filter((_, i) => i !== index));
+    const serviceId = services[index].id; // Get the ID of the service to delete
+
+    axios.delete(`http://localhost:5000/api/offices/${office.id}/services/${serviceId}`)
+      .then(() => {
+        setServices(services.filter((_, i) => i !== index)); // Update local state
+      })
+      .catch((error) => {
+        console.error("Error deleting service:", error);
+        alert("Failed to delete service.");
+      });
   };
 
   // Add or edit personnel
@@ -60,10 +101,22 @@ const EditOffice = () => {
 
     if (editType === "personnel" && editIndex !== null) {
       const updatedPersonnel = [...personnel];
-      updatedPersonnel[editIndex] = newPersonnel.trim();
-      setPersonnel(updatedPersonnel);
-      setEditIndex(null);
-      setEditType("");
+      const personnelId = updatedPersonnel[editIndex].id; // Get the ID of the personnel being edited
+
+      // Update the personnel in the backend
+      axios.put(`http://localhost:5000/api/offices/${office.id}/personnel/${personnelId}`, {
+        personnelName: newPersonnel.trim(),
+      })
+      .then(() => {
+        updatedPersonnel[editIndex].name = newPersonnel.trim(); // Update the local state
+        setPersonnel(updatedPersonnel);
+        setEditIndex(null);
+        setEditType("");
+      })
+      .catch((error) => {
+        console.error("Error updating personnel:", error);
+        alert("Failed to update personnel.");
+      });
     } else {
       setPersonnel([...personnel, newPersonnel.trim()]);
     }
@@ -73,18 +126,27 @@ const EditOffice = () => {
 
   // Edit existing personnel
   const editPersonnel = (index) => {
-    setNewPersonnel(personnel[index]);
+    setNewPersonnel(personnel[index].name); // Set the name for editing
     setEditIndex(index);
     setEditType("personnel");
   };
 
   // Delete personnel
   const removePersonnel = (index) => {
-    setPersonnel(personnel.filter((_, i) => i !== index));
+    const personnelId = personnel[index].id; // Get the ID of the personnel to delete
+
+    axios.delete(`http://localhost:5000/api/offices/${office.id}/personnel/${personnelId}`)
+      .then(() => {
+        setPersonnel(personnel.filter((_, i) => i !== index)); // Update local state
+      })
+      .catch((error) => {
+        console.error("Error deleting personnel:", error);
+        alert("Failed to delete personnel.");
+      });
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!officeName.trim()) {
@@ -92,17 +154,41 @@ const EditOffice = () => {
       return;
     }
 
-    const existingOffices = JSON.parse(localStorage.getItem("offices")) || [];
-    const updatedOffices = existingOffices.map((o) =>
-      o.id === office.id
-        ? { ...o, office: officeName, services, personnel }
-        : o
-    );
+    try {
+      if (!office?.id) {
+        alert("Invalid office data.");
+        return;
+      }
 
-    localStorage.setItem("offices", JSON.stringify(updatedOffices));
+      await axios.put(`http://localhost:5000/api/offices/${office.id}`, {
+        office: officeName,
+        services,
+        personnel,
+      });
 
-    navigate("/manageoffice");
+      alert("Office updated successfully!");
+      navigate("/manageoffice");
+    } catch (error) {
+      console.error("Error updating office:", error);
+      alert("Failed to update office.");
+    }
   };
+
+  // Pagination logic for services
+  const indexOfLastService = currentServicePage * servicesPerPage;
+  const indexOfFirstService = indexOfLastService - servicesPerPage;
+  const currentServices = services.slice(indexOfFirstService, indexOfLastService);
+
+  // Pagination logic for personnel
+  const indexOfLastPersonnel = currentPersonnelPage * personnelPerPage;
+  const indexOfFirstPersonnel = indexOfLastPersonnel - personnelPerPage;
+  const currentPersonnel = personnel.slice(indexOfFirstPersonnel, indexOfLastPersonnel);
+
+  // Change page for services
+  const paginateServices = (pageNumber) => setCurrentServicePage(pageNumber);
+
+  // Change page for personnel
+  const paginatePersonnel = (pageNumber) => setCurrentPersonnelPage(pageNumber);
 
   return (
     <div>
@@ -115,7 +201,7 @@ const EditOffice = () => {
 
             {/* Office Name */}
             <div className="mb-3">
-              <label className="form-label">Office Name</label>
+              <label htmlFor="officeName" className="form-label"></label>
               <input
                 type="text"
                 className="form-control"
@@ -141,16 +227,27 @@ const EditOffice = () => {
                 </button>
               </div>
               <ul className="list-group mt-2">
-                {services.map((service, index) => (
+                {currentServices.map((service, index) => (
                   <li key={index} className="list-group-item d-flex justify-content-between">
-                    {service}
+                    {service.name}
                     <div>
-                      <i className="bi bi-pencil-square text-primary me-2" style={{ cursor: "pointer" }} onClick={() => editService(index)} />
-                      <i className="bi bi-trash text-danger" style={{ cursor: "pointer" }} onClick={() => removeService(index)} />
+                      <i className="bi bi-pencil-square text-primary me-2" style={{ cursor: "pointer" }} onClick={() => editService(index + indexOfFirstService)} />
+                      <i className="bi bi-trash text-danger" style={{ cursor: "pointer" }} onClick={() => removeService(index + indexOfFirstService)} />
                     </div>
                   </li>
                 ))}
               </ul>
+              <nav>
+                <ul className="pagination">
+                  {Array.from({ length: Math.ceil(services.length / servicesPerPage) }, (_, i) => (
+                    <li key={i} className={`page-item ${currentServicePage === i + 1 ? 'active' : ''}`}>
+                      <button className="page-link" onClick={() => paginateServices(i + 1)}>
+ {i + 1}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
             </div>
 
             {/* Personnel */}
@@ -169,16 +266,27 @@ const EditOffice = () => {
                 </button>
               </div>
               <ul className="list-group mt-2">
-                {personnel.map((person, index) => (
+                {currentPersonnel.map((person, index) => (
                   <li key={index} className="list-group-item d-flex justify-content-between">
-                    {person}
+                    {person.name}
                     <div>
-                      <i className="bi bi-pencil-square text-primary me-2" style={{ cursor: "pointer" }} onClick={() => editPersonnel(index)} />
-                      <i className="bi bi-trash text-danger" style={{ cursor: "pointer" }} onClick={() => removePersonnel(index)} />
+                      <i className="bi bi-pencil-square text-primary me-2" style={{ cursor: "pointer" }} onClick={() => editPersonnel(index + indexOfFirstPersonnel)} />
+                      <i className="bi bi-trash text-danger" style={{ cursor: "pointer" }} onClick={() => removePersonnel(index + indexOfFirstPersonnel)} />
                     </div>
                   </li>
                 ))}
               </ul>
+              <nav>
+                <ul className="pagination">
+                  {Array.from({ length: Math.ceil(personnel.length / personnelPerPage) }, (_, i) => (
+                    <li key={i} className={`page-item ${currentPersonnelPage === i + 1 ? 'active' : ''}`}>
+                      <button className="page-link" onClick={() => paginatePersonnel(i + 1)}>
+                        {i + 1}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
             </div>
 
             {/* Submit Button */}

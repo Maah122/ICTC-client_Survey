@@ -65,7 +65,6 @@ function AddSurvey() {
             <div className="d-flex justify-content-between align-items-center mb-3 survey-header">
               <h2 className="font-inter">Add Survey</h2>
               <div className="button-container"> 
-                <button className="btn">Save Draft</button>
                 <button className="btn" onClick={handleSaveForm}>Save Form</button>
               </div>
             </div>

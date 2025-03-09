@@ -647,15 +647,15 @@ button:hover {
 }
 
 .modal-content {
-  background: white;
-  padding: 24px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-  max-width: 500px;
-  width: 90%;
-  border: 2px solid #ccc;
-  animation: fadeIn 0.3s ease-in-out;
+  background: white !important;
+  padding: 24px !important;
+  border-radius: 12px !important;
+  text-align: center !important;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3) !important;
+  max-width: 500px !important;
+  width: 90% !important;
+  border: 2px solid #ccc !important;
+  animation: fadeIn 0.3s ease-in-out !important;
 }
 
 /* Title Styling */

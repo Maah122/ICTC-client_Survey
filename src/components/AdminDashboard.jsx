@@ -17,7 +17,7 @@ const surveyOptions = [
   { id: 1, surveyName: "Employee Satisfaction Survey" },
   { id: 2, surveyName: "Customer Service Evaluation" },
   { id: 3, surveyName: "Workplace Environment Survey" },
-  { id: 4, surveyName: "Training Program Assessment" },
+  { id: 4, surveyName: "Training Program Assessment" }, 
 ];
 
 const responseData = [
