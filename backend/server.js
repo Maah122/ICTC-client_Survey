@@ -7,6 +7,7 @@ const officeRoutes = require("./route/officeRoute");
 const responseRoutes = require("./route/responseRoute");
 const questionOptionRoutes = require("./route/questionOptionRoute");
 const infoRoutes = require("./route/infoRoute");
+const userRoutes = require("./route/userRoute"); // Import User Route
 
 dotenv.config();
 const app = express();
@@ -22,6 +23,7 @@ app.use("/api", questionOptionRoutes);
 app.use("/api", responseRoutes);
 app.use("/api", surveyRoutes);
 app.use("/api", officeRoutes);
+app.use("/api", userRoutes); // Add User Route
 
 // Global Error Handler
 app.use((err, req, res, next) => {

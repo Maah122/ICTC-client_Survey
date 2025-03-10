@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../global/NavBar";
 import AdminSidebar from "../global/AdminSideBar";
 import './AddUser.css';
+import axios from 'axios';
 
 const officeOptions = [
   { id: 1, officeName: "Accounting Division" },
@@ -59,9 +60,27 @@ const EditUser = () => {
     setSelectedOffices(selectedOffices.filter((o) => o !== office));
   };
 
-  const saveUser = () => {
-    console.log("User Updated:", { ...editedUser, rights: userRights, offices: selectedOffices });
-    navigate("/manageuser");
+  const saveUser = async () => {
+    try {
+      const updatedUser = {
+        name: editedUser.name,
+        email: editedUser.email,
+        password: editedUser.password,
+        userRights: userRights
+      };
+  
+      const response = await axios.put(
+        `http://localhost:5000/api/updateuser/${editedUser.id}`, 
+        updatedUser
+      );
+  
+      console.log("User Updated:", response.data);
+      alert("User updated successfully!");
+      navigate("/manageuser");
+    } catch (error) {
+      console.error("Error updating user:", error);
+      alert("Failed to update user. Please try again.");
+    }
   };
 
   const saveUserRights = () => {
@@ -115,7 +134,7 @@ const EditUser = () => {
                   />
                 </div>
 
-                {/* <div className="form-group mt-3">
+                <div className="form-group mt-3">
                   <label>User Rights:</label>
                   <div>
                     <label>
@@ -142,7 +161,7 @@ const EditUser = () => {
                       </ul>
                     </div>
                   )}
-                </div> */}
+                </div> 
 
                 <button onClick={saveUser} className="btn btn-success mt-4 w-100">
                   Save Changes

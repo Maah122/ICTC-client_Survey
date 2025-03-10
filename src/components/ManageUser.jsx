@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
+
 import { useNavigate } from "react-router-dom";
 import Navbar from "../global/NavBar";
 import AdminSidebar from "../global/AdminSideBar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./ManageUser.css";
+import axios from "axios";
 
 
 const officeOptions = [
@@ -20,25 +22,9 @@ const officeOptions = [
   { id: 11, officeName: "Legal Services Office" },
   { id: 12, officeName: "MSU-IIT Center for Resiliency" },
 ];
-const mockUsers = [
-  { id: 1, office: "CCS", name:"John Doe", email: "john@example.com", rights: "View all" },
-  { id: 2, office: "CSM", name:"Jane Doe", email: "jane@example.com", rights: "Limited" },
-  { id: 3, office: "CCS",  name:"Mark Doe",email: "mark@example.com", rights: "Limited" },
-  { id: 4, office: "CASS",  name:"Alex Doe",email: "alex@example.com" , rights: "Limited"},
-  { id: 5, office: "CEBA",  name:"Austin Doe",email: "austin@example.com", rights: "Limited" },
-  { id: 6, office: "Accounting Division", name:"Michael Doe", email: "michael@example.com", rights: "Limited" },
-  { id: 7, office: "CED",  name:"Luna Doe",email: "luna@example.com", rights: "Limited" },
-  { id: 8, office: "CCS", name:"John Doe", email: "john@example.com", rights: "Limited" },
-  { id: 9, office: "CSM", name:"Jane Doe", email: "jane@example.com" , rights: "Limited"},
-  { id: 10, office: "CCS",  name:"Mark Doe",email: "mark@example.com" , rights: "Limited"},
-  { id: 11, office: "CASS",  name:"Alex Doe",email: "alex@example.com", rights: "Limited" },
-  { id: 12, office: "CEBA",  name:"Austin Doe",email: "austin@example.com" , rights: "Limited"},
-  { id: 13, office: "Accounting Division", name:"Michael Doe", email: "michael@example.com", rights: "Limited"},
-  { id: 14, office: "CED",  name:"Luna Doe",email: "luna@example.com" , rights: "Limited"},
-];
 
 const ManageUser = () => {
-  const [users, setUsers] = useState(mockUsers);
+  const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOffice, setSelectedOffice] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,26 +34,19 @@ const ManageUser = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [filterOffice, setFilterOffice] = useState("");
 
-  const addOffice = () => {
-    if (selectedOffice && !currentUser?.offices?.includes(selectedOffice)) {
-      const updatedOffices = [...(currentUser.offices || []), selectedOffice];
+  // Fetch Users from API
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/users");
+        setUsers(response.data); // No additional mapping required now
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
   
-      const updatedUser = {
-        ...currentUser,
-        office: updatedOffices.join(", "), // Update the office field
-        offices: updatedOffices,           // Keep track of selected offices
-      };
-  
-      setCurrentUser(updatedUser);
-  
-      // Update the users list to reflect the new offices
-      setUsers((prevUsers) =>
-        prevUsers.map((user) => (user.id === currentUser.id ? updatedUser : user))
-      );
-  
-      setSelectedOffice(""); // Clear selection
-    }
-  };
+    fetchUsers();
+  }, []);
   
   
   
@@ -80,15 +59,31 @@ const ManageUser = () => {
     setUsers(users.map((user) => (user.id === currentUser.id ? currentUser : user)));
     setShowModal(false);
   };
+  const addOffice = () => {
+    if (selectedOffice && !currentUser?.offices?.includes(selectedOffice)) {
+      setCurrentUser({
+        ...currentUser,
+        offices: [...(currentUser?.offices || []), selectedOffice],
+      });
+    }
+  };
+  
 
-  const deleteUser = (id) => {
+  const deleteUser = async (id) => {
     const isConfirmed = window.confirm("Are you sure you want to delete this user?");
     
     if (isConfirmed) {
-      setUsers(users.filter((user) => user.id !== id));
-      alert("User deleted successfully!");
+      try {
+        await axios.delete(`http://localhost:5000/api/deleteuser/${id}`);
+        setUsers(users.filter((user) => user.id !== id));  // Update state only after successful deletion
+        alert("User deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        alert("Failed to delete user. Please try again.");
+      }
     }
   };
+  
   
   const goToAddUserPage = () => {
     navigate("/add-user");
