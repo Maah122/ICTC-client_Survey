@@ -14,56 +14,65 @@ function EditSurvey() {
   const surveyId = searchParams.get("surveyId");
   const [updatedSurvey, setUpdatedSurvey] = useState(null);
 
-  console.log("Received survey ID from search params:", surveyId);
-
   const handleUpdate = async (surveyData) => {
     if (!surveyData || !surveyData.id) {
-      alert("Survey ID is required!");
-      return;
-    }
-  
-    // Validate sections and questions
-    if (!surveyData.sections || surveyData.sections.length === 0) {
-      alert("At least one section is required!");
-      return;
-    }
-  
-    // Check each section for valid questions
-    for (let section of surveyData.sections) {
-      if (!section.title || section.title.trim() === "") {
-        alert("Each section must have a title.");
+        alert("Survey ID is required!");
         return;
-      }
-      for (let question of section.questions) {
-        if (!question.text || question.text.trim() === "") {
-          alert("Each question must have text.");
-          return;
-        }
-      }
     }
-  
-    console.log("Sending Survey Data:", JSON.stringify(surveyData, null, 2));
-    
-    try {
-      const response = await axios.put(
-        `http://localhost:5000/api/surveys/update/${surveyData.id}`,
-        surveyData,
-        {
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
-      );
-      console.log("Response Data:", response.data);
 
-      // Optionally, give feedback or reset the form
-      alert("Survey saved successfully!");
-      navigate("/managesurvey");
+    if (!surveyData.sections || surveyData.sections.length === 0) {
+        alert("At least one section is required!");
+        return;
+    }
+
+    for (let section of surveyData.sections) {
+        if (!section.title || section.title.trim() === "") {
+            alert("Each section must have a title.");
+            return;
+        }
+        for (let question of section.questions) {
+            if (!question.text || question.text.trim() === "") {
+                alert("Each question must have text.");
+                return;
+            }
+            // Ensure isrequired is a boolean
+            question.isrequired = question.isrequired === true; // Convert to boolean
+            console.log(`Question ID ${question.id} - Required: ${question.isrequired}`);
+        }
+    }
+
+    console.log("Fetched Survey Data:", surveyData);
+
+    const updatedSurveyData = {
+        id: surveyData.id,
+        title: surveyData.title,
+        description: surveyData.description,
+        sections: surveyData.sections.map(section => ({
+            id: section.id,
+            title: section.title,
+            description: section.description,
+            questions: section.questions.map(question => ({
+                id: question.id,
+                text: question.text,
+                type: question.type,
+                required: question.required !== undefined ? question.required : false,
+                options: question.options || []
+            }))
+        }))
+    };
+
+    console.log("Sending Survey Data:", JSON.stringify(updatedSurveyData, null, 2));
+
+    try {
+        const response = await axios.put(`http://localhost:5000/api/surveys/update/${updatedSurveyData.id}`, updatedSurveyData);
+        console.log("Response Data:", response.data);
+        alert("Survey saved successfully!");
+        navigate("/managesurvey");
     } catch (error) {
-      console.error("Error Response Data:", error.response?.data);
-      alert("An error occurred while updating the survey: " + (error.response?.data.message || error.message));
+      console.error("Error updating survey details:", error);
+      throw new Error("Survey update failed: " + error.message); // Provide more context  
     }        
-  };
+};
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

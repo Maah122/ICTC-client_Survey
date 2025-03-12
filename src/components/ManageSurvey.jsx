@@ -17,18 +17,26 @@ const ManageUser  = () => {
 
   useEffect(() => {
     const fetchSurveys = async () => {
-        try {
-            const response = await axios.get("http://localhost:5000/api/surveys");
-            console.log("Fetched surveys:", response.data); // Debugging log
-            // Sort surveys by ID in ascending order
-            const sortedSurveys = response.data.sort((a, b) => a.id - b.id);
-            setSurveys(sortedSurveys);
-        } catch (error) {
-            console.error("Error fetching surveys:", error);
+      try {
+        const response = await axios.get("http://localhost:5000/api/surveys");
+        console.log("Fetched surveys:", response.data);
+  
+        const sortedSurveys = response.data.sort((a, b) => a.id - b.id);
+        setSurveys(sortedSurveys);
+  
+        // Find the active survey (if any) and set it
+        const activeSurvey = sortedSurveys.find((survey) => survey.status === true);
+        if (activeSurvey) {
+          setActiveSurveyId(activeSurvey.id);
         }
+      } catch (error) {
+        console.error("Error fetching surveys:", error);
+      }
     };
+  
     fetchSurveys();
-}, []);
+  }, []);
+  
 
 const deleteSurvey = async (surveyId) => {
   try {
@@ -58,29 +66,22 @@ const deleteSurvey = async (surveyId) => {
 
 
   const handleStatusChange = async (surveyId, currentStatus) => {
-    const newStatus = !currentStatus; // Toggle status between true and false
-
-    // If the new status is true (active), check if there's already an active survey
+    const newStatus = !currentStatus;
+  
     if (newStatus) {
-      if (activeSurveyId !== null) {
-        // Deactivate the currently active survey
-        await axios.put(`http://localhost:5000/api/surveys/${activeSurveyId}/status`, {
-          status: false, // Set the currently active survey to inactive
-        });
+      if (activeSurveyId !== null && activeSurveyId !== surveyId) {
+        await axios.put(`http://localhost:5000/api/surveys/${activeSurveyId}/status`, { status: false });
       }
-      setActiveSurveyId(surveyId); // Set the new active survey ID
+      setActiveSurveyId(surveyId);
     } else {
-      // If the survey is being set to inactive, clear the activeSurveyId
       if (activeSurveyId === surveyId) {
         setActiveSurveyId(null);
       }
     }
-
+  
     try {
-      const response = await axios.put(`http://localhost:5000/api/surveys/${surveyId}/status`, {
-        status: newStatus, // Send the new status as a boolean
-      });
-
+      const response = await axios.put(`http://localhost:5000/api/surveys/${surveyId}/status`, { status: newStatus });
+  
       if (response.status === 200) {
         alert("Status updated successfully!");
         setSurveys((prevSurveys) =>
@@ -89,14 +90,14 @@ const deleteSurvey = async (surveyId) => {
           )
         );
       } else {
-        console.error("Failed to update status");
         alert("Failed to update status. Please try again.");
       }
     } catch (error) {
-      console.error("Error updating status:", error.response.data); // Log the error response for more details
+      console.error("Error updating status:", error);
       alert("Error updating status. Please try again later.");
     }
   };
+  
 
   const indexOfLastSurvey = currentPage * surveysPerPage;
   const indexOfFirstSurvey = indexOfLastSurvey - surveysPerPage;

@@ -41,21 +41,32 @@ export default function FormsBuilder({ surveyId, setSurveyData }) {
   useEffect(() => {
     const fetchSurveyData = async () => {
       if (surveyId) {
-        try {
-          const response = await axios.get(`http://localhost:5000/api/surveys/${surveyId}`);
-          const surveyData = response.data;
-
-          // Set the form data based on the fetched survey data
-          setForm(surveyData.sections || []);
-          setFormTitle(surveyData.title || "");
-          setFormDescription(surveyData.description || "");
-          isEditing.current = true; // Set editing flag
-        } catch (error) {
-          console.error("Error fetching survey data:", error);
-          alert("Failed to fetch survey data. Please try again.");
-        }
+          try {
+              const response = await axios.get(`http://localhost:5000/api/surveys/${surveyId}`);
+              const surveyData = response.data;
+  
+              // Normalize options here
+              const normalizedSections = surveyData.sections.map(section => ({
+                  ...section,
+                  questions: section.questions.map(question => ({
+                      ...question,
+                      options: question.options.map(opt => ({
+                          id: opt.id, // Ensure ID is included
+                          text: opt.text,
+                      }))
+                  }))
+              }));
+  
+              setForm(normalizedSections);
+              setFormTitle(surveyData.title || "");
+              setFormDescription(surveyData.description || "");
+              isEditing.current = true; // Set editing flag
+          } catch (error) {
+              console.error("Error fetching survey data:", error);
+              alert("Failed to fetch survey data. Please try again.");
+          }
       }
-    };
+  };
 
     fetchSurveyData();
   }, [surveyId]); // Only run this effect when surveyId changes
@@ -67,6 +78,8 @@ export default function FormsBuilder({ surveyId, setSurveyData }) {
       description: formDescription,
       sections: form,
     };
+
+    console.log("Sending payload:", newSurveyData); // ✅ Log payload
 
     if (JSON.stringify(prevSurveyData.current) !== JSON.stringify(newSurveyData)) {
       prevSurveyData.current = newSurveyData;
@@ -100,7 +113,6 @@ export default function FormsBuilder({ surveyId, setSurveyData }) {
               text: "",
               type: "paragraph",
               options: [],
-              isrequired: false
             }
           ]
         };
@@ -137,6 +149,20 @@ export default function FormsBuilder({ surveyId, setSurveyData }) {
     setForm(newForm);
   };
 
+  const handleToggleRequired = (sectionId, index) => {
+    const newForm = form.map(section =>
+        section.id === sectionId
+            ? {
+                ...section,
+                questions: section.questions.map((q, i) =>
+                    i === index ? { ...q, required: !q.required } : q // Toggle the required status
+                ),
+            }
+            : section
+    );
+    setForm(newForm);
+};
+
   const handleTypeChange = (sectionId, index, value) => {
     const newForm = form.map(section =>
       section.id === sectionId
@@ -163,13 +189,47 @@ export default function FormsBuilder({ surveyId, setSurveyData }) {
         ? {
             ...section,
             questions: section.questions.map((el, i) =>
-              i === index ? { ...el, options: [...el.options, `Option ${el.options.length + 1}`] } : el
+              i === index
+                ? {
+                    ...el,
+                    options: [...el.options, { id: el.options.length + 1, text: `Option ${el.options.length + 1}` }]
+                  }
+                : el
             ),
           }
         : section
     );
     setForm(newForm);
   };
+
+  const normalizeOptions = (options) => {
+    return options.map(opt => ({
+      text: typeof opt === "object" && opt.text ? opt.text : opt,
+    }));
+  };
+  
+
+  // Handle option text updates properly
+const updateOption = (sectionId, questionIndex, optionIndex, value) => {
+  const newForm = form.map(section =>
+    section.id === sectionId
+      ? {
+          ...section,
+          questions: section.questions.map((q, i) =>
+            i === questionIndex
+              ? {
+                  ...q,
+                  options: q.options.map((opt, j) =>
+                    j === optionIndex ? { ...opt, text: value } : opt
+                  )
+                }
+              : q
+          ),
+        }
+      : section
+  );
+  setForm(newForm);
+};
 
   const previewForm = () => {
     setShowPreview(true);
@@ -258,10 +318,10 @@ export default function FormsBuilder({ surveyId, setSurveyData }) {
                       🗑️  
                     </button>
                     <Button 
-                      onClick={() => updateField(section.id, index, "isrequired", !question.isrequired)} 
-                      className={`toggle-required-button ${question.isrequired ? 'active' : ''}`}
+                        onClick={() => handleToggleRequired(section.id, index)} 
+                        className={`toggle-required-button ${question.required ? 'active' : ''}`}
                     >
-                      {question.isrequired ? "Required" : "Optional"}
+                        {question.required === true ? "Required" : "Optional"}
                     </Button>
                   </div>
                   <div className="question-type-container">
@@ -298,14 +358,7 @@ export default function FormsBuilder({ surveyId, setSurveyData }) {
                           <input
                             type="text"
                             value={opt.text}
-                            onChange={(e) =>
-                              updateField(
-                                section.id,
-                                index,
-                                "options",
-                                [...question.options.slice(0, i), { ...opt, text: e.target.value }, ...question.options.slice(i + 1)]
-                              )
-                            }
+                            onChange={(e) => updateOption(section.id, index, i, e.target.value)}
                             className="form-input"
                           />
                         </div>

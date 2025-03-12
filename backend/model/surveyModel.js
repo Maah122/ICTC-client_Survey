@@ -18,7 +18,8 @@
                 LEFT JOIN "CSS".section sec ON s.id = sec.survey_id
                 LEFT JOIN "CSS".question q ON sec.id = q.section_id
                 LEFT JOIN "CSS".option o ON q.id = o.question_id
-                WHERE s.id = $1`,
+                WHERE s.id = $1
+                ORDER BY sec.id, q.id`, // Sort by section ID and question ID
                 [surveyId]
             );
         
@@ -50,7 +51,7 @@
                         id: row.question_id,
                         text: row.question_text,
                         type: row.question_type,
-                        required: row.question_required,
+                        required: row.question_required, // Ensure this is correctly set
                         options: [],
                     };
                     section.questions.push(question);
@@ -228,31 +229,54 @@
             try {
                 await client.query("BEGIN");
         
-                // ✅ Update survey
-                await client.query(
+                // Log incoming data
+                console.log("Incoming data:", { surveyId, title, description, sections });
+        
+                // Update survey
+                const updateSurveyRes = await client.query(
                     `UPDATE "CSS".survey 
                      SET title = $1, description = $2
-                     WHERE id = $3`,
+                     WHERE id = $3 RETURNING *`, // Use RETURNING to get the updated survey
                     [title, description, surveyId]
                 );
         
-                // ✅ Fetch existing section IDs from DB
+                // Check if the survey was updated
+                if (updateSurveyRes.rowCount === 0) {
+                    console.log("No survey found with the given ID.");
+                    return null; // Return null if no survey was updated
+                }
+        
+                const updatedSurvey = updateSurveyRes.rows[0]; // Get the updated survey
+                console.log("Updated survey:", updatedSurvey);
+        
+                // Sort sections by ID in ascending order
+                sections.sort((a, b) => a.id - b.id);
+                console.log("Sorted sections:", sections);
+        
+                // Fetch existing section IDs from DB
                 const existingSectionsRes = await client.query(
                     `SELECT id FROM "CSS".section WHERE survey_id = $1`,
                     [surveyId]
                 );
                 const existingSectionIds = existingSectionsRes.rows.map(row => row.id);
+                console.log("Existing section IDs:", existingSectionIds);
         
                 const incomingSectionIds = sections.filter(s => s.id).map(s => s.id);
                 const sectionIdsToDelete = existingSectionIds.filter(id => !incomingSectionIds.includes(id));
+                console.log("Section IDs to delete:", sectionIdsToDelete);
         
-                // ❌ Delete removed sections (this should cascade if FK is set properly)
+                // Delete removed sections
                 for (const sectionId of sectionIdsToDelete) {
                     await client.query(`DELETE FROM "CSS".section WHERE id = $1`, [sectionId]);
+                    console.log(`Deleted section ID: ${sectionId}`);
                 }
         
                 for (const section of sections) {
                     let sectionId = section.id;
+        
+                    // Sort questions by ID in ascending order
+                    section.questions.sort((a, b) => a.id - b.id);
+                    console.log("Sorted questions for section:", sectionId, section.questions);
         
                     if (sectionId) {
                         // Update existing section
@@ -262,6 +286,7 @@
                              WHERE id = $3`,
                             [section.title, section.description, sectionId]
                         );
+                        console.log(`Updated section ID: ${sectionId}`);
                     } else {
                         // Insert new section
                         const sectionResult = await client.query(
@@ -270,55 +295,69 @@
                             [surveyId, section.title, section.description]
                         );
                         sectionId = sectionResult.rows[0].id;
+                        console.log(`Inserted new section ID: ${sectionId}`);
                     }
         
-                    // ✅ Fetch existing questions for the section
+                    // Fetch existing questions for the section
                     const existingQuestionsRes = await client.query(
                         `SELECT id FROM "CSS".question WHERE section_id = $1`,
                         [sectionId]
                     );
                     const existingQuestionIds = existingQuestionsRes.rows.map(row => row.id);
+                    console.log("Existing question IDs for section:", sectionId, existingQuestionIds);
+        
                     const incomingQuestionIds = section.questions.filter(q => q.id).map(q => q.id);
                     const questionIdsToDelete = existingQuestionIds.filter(id => !incomingQuestionIds.includes(id));
+                    console.log("Question IDs to delete:", questionIdsToDelete);
         
-                    // ❌ Delete removed questions
+                    // Delete removed questions
                     for (const questionId of questionIdsToDelete) {
                         await client.query(`DELETE FROM "CSS".question WHERE id = $1`, [questionId]);
+                        console.log(`Deleted question ID: ${questionId}`);
                     }
         
                     for (const question of section.questions) {
                         let questionId = question.id;
-        
+                    
+                        // Ensure required is a boolean
+                        const isRequired = question.required === null ? false : question.required;
+                    
                         if (questionId) {
                             // Update existing question
                             await client.query(
                                 `UPDATE "CSS".question 
-                                 SET text = $1, type = $2, isrequired = $3 
+                                 SET text = $1, type = $2, isrequired = $3::BOOLEAN
                                  WHERE id = $4`,
-                                [question.text, question.type, question.isrequired, questionId] // Include isRequired
+                                [question.text, question.type, isRequired, questionId] // Use isRequired here
                             );
+                            console.log(`Updated question ID: ${questionId}`);
                         } else {
                             // Insert new question
                             const questionResult = await client.query(
                                 `INSERT INTO "CSS".question (section_id, text, type, isrequired) 
-                                 VALUES ($1, $2, $3, $4) RETURNING id`,
-                                [sectionId, question.text, question.type, question.isrequired] // Include isRequired
+                                 VALUES ($1, $2, $3, $4::BOOLEAN) RETURNING id`,
+                                [sectionId, question.text, question.type, isRequired] // Use isRequired here
                             );
                             questionId = questionResult.rows[0].id;
+                            console.log(`Inserted new question ID: ${questionId}`);
                         }
-        
-                        // ✅ Fetch existing options for the question
+                        
+                        // Fetch existing options for the question
                         const existingOptionsRes = await client.query(
                             `SELECT id FROM "CSS".option WHERE question_id = $1`,
                             [questionId]
                         );
                         const existingOptionIds = existingOptionsRes.rows.map(row => row.id);
+                        console.log("Existing option IDs for question:", questionId, existingOptionIds);
+        
                         const incomingOptionIds = question.options.filter(o => o.id).map(o => o.id);
                         const optionIdsToDelete = existingOptionIds.filter(id => !incomingOptionIds.includes(id));
+                        console.log("Option IDs to delete:", optionIdsToDelete);
         
-                        // ❌ Delete removed options
+                        // Delete removed options
                         for (const optionId of optionIdsToDelete) {
                             await client.query(`DELETE FROM "CSS".option WHERE id = $1`, [optionId]);
+                            console.log(`Deleted option ID: ${optionId}`);
                         }
         
                         for (const option of question.options) {
@@ -330,6 +369,7 @@
                                      WHERE id = $2`,
                                     [option.text, option.id]
                                 );
+                                console.log(`Updated option ID: ${option.id}`);
                             } else {
                                 // Insert new option
                                 await client.query(
@@ -337,21 +377,23 @@
                                      VALUES ($1, $2)`,
                                     [questionId, option.text]
                                 );
+                                console.log(`Inserted new option for question ID: ${questionId}`);
                             }
                         }
                     }
                 }
         
                 await client.query("COMMIT");
-                return { id: surveyId, title, description };
+                console.log("Survey update completed successfully.");
+                return updatedSurvey; // Return the updated survey
             } catch (error) {
                 await client.query("ROLLBACK");
                 console.error("Error updating survey details:", error);
-                throw error;
+                throw error; // Rethrow the error for further handling
             } finally {
                 client.release();
             }
-        },              
+        },
 
         deleteSurvey: async (surveyId) => {
             const client = await pool.connect();

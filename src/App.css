@@ -631,6 +631,14 @@ button:hover {
   background: #870d0d;
 }
 
+.input-error {
+  border: 1px solid red; /* Highlight the border in red */
+}
+
+.instructions-header2.input-error {
+  color: red; /* Change the text color to red for required fields */
+}
+
 
 /* Modal Styling */
 .modal-overlay {

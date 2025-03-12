@@ -89,28 +89,47 @@ const surveyController = {
         }
     },
 
+    
     // Controller: updateSurveyDetails
     updateSurveyDetails: async (req, res) => {
         try {
-            const { id } = req.params; // Get survey ID from URL
+            const { surveyId } = req.params; // Get survey ID from URL
             const { title, description, sections } = req.body; // Get updated data
-    
+
+            console.log("Received request to update survey:");
+            console.log("Survey ID:", surveyId);
+            console.log("Request body:", req.body);
+
             if (!title || !description || !Array.isArray(sections)) {
+                console.log("Invalid request data:", { title, description, sections });
                 return res.status(400).json({ message: "Invalid request data" });
             }
-    
-            const updatedSurvey = await Survey.updateSurveyDetails(id, title, description, sections);
-    
+
+            console.log("Preparing to update survey with the following details:");
+            console.log("Title:", title);
+            console.log("Description:", description);
+            console.log("Sections:", JSON.stringify(sections, null, 2)); // Pretty-print sections
+
+            console.log("Updating survey with new details...");
+
+            const updatedSurvey = await Survey.updateSurveyDetails(surveyId, title, description, sections);
+
+            console.log("Update function response:", updatedSurvey); // Log raw result
+
             if (!updatedSurvey) {
+                console.log("Survey update failed for ID:", surveyId);
                 return res.status(400).json({ message: "Survey update failed" });
             }
-    
+
+            console.log("Survey updated successfully:", updatedSurvey);
+
             return res.json({ message: "Survey updated successfully", survey: updatedSurvey });
         } catch (error) {
             console.error("Error updating survey:", error);
-            return res.status(500).json({ message: "Internal server error", error: error.message }); // Send error details in response
+            return res.status(500).json({ message: "Internal server error", error: error.message });
         }
-    },    
+    },
+
 
     deleteSurvey: async (req, res) => {
         try {
