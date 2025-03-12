@@ -30,9 +30,19 @@ const ManageUser  = () => {
     fetchSurveys();
 }, []);
 
-  const deleteSurvey = (id) => {
-    setSurveys(surveys.filter((survey) => survey.id !== id));
-  };
+const deleteSurvey = async (surveyId) => {
+  try {
+      const response = await axios.delete(`http://localhost:5000/api/surveys/delete/${surveyId}`);
+      if (response.status === 200) {
+          alert("Survey deleted successfully!");
+          // Optionally, refresh the survey list or remove the deleted survey from the state
+          setSurveys(surveys.filter(survey => survey.id !== surveyId));
+      }
+  } catch (error) {
+      console.error("Error deleting survey:", error);
+      alert("Failed to delete survey. Please try again.");
+  }
+};
 
   const goToAddSurveyPage = () => {
     navigate("/add-survey");
@@ -165,13 +175,21 @@ const ManageUser  = () => {
                     </label>
                   </td>
                   <td>
-                    <i
+                      <i
                       id="edit-btn"
                       className="bi bi-pencil-square"
                       style={{ cursor: "pointer" }}
-                      onClick={() => navigate("/edit-survey", { state: { survey } })}
+                      onClick={() => {
+                        console.log("Editing survey:", survey); // Debugging log
+                        navigate(`/edit-survey?surveyId=${survey.id}`); // Pass surveyId as a query parameter
+                      }}
                     />
-                    <i id="edit-btn" className="bi bi-trash" style={{ cursor: 'pointer', marginRight: '' }} onClick={() => deleteSurvey(survey.id)}></i>
+                    <i 
+                      id="edit-btn" 
+                      className="bi bi-trash" 
+                      style={{ cursor: 'pointer', marginRight: '' }} 
+                      onClick={() => deleteSurvey(survey.id)}
+                    />
                   </td>
                 </tr>
               ))}

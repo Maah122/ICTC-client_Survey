@@ -8,6 +8,7 @@ const responseRoutes = require("./route/responseRoute");
 const questionOptionRoutes = require("./route/questionOptionRoute");
 const infoRoutes = require("./route/infoRoute");
 const userRoutes = require("./route/userRoute"); // Import User Route
+const answerRoutes = require("./route/answerRoute")
 
 dotenv.config();
 const app = express();
@@ -18,6 +19,7 @@ app.use(express.json({ limit: "50mb" }));  // ⬅️ Increase request size limit
 app.use(express.urlencoded({ limit: "50mb", extended: true }));  // ⬅️ Increase form data size
 
 // Routes
+app.use("/api", answerRoutes);
 app.use("/api", infoRoutes);
 app.use("/api", questionOptionRoutes);
 app.use("/api", responseRoutes);

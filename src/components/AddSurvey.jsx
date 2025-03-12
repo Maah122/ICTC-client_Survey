@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import Navbar from '../global/NavBar';
 import AdminSidebar from '../global/AdminSideBar';
 import FormsBuilder from './formbuilder';
@@ -7,6 +8,7 @@ import axios from 'axios';
 
 function AddSurvey() {
     const [formData, setFormData] = useState(null);
+    const navigate = useNavigate(); 
 
 
     const handleSaveForm = async () => {
@@ -22,10 +24,11 @@ function AddSurvey() {
   
       const sections = formData.sections.map(section => ({
           title: section.title || "Untitled Section",
-          description: section.description !== undefined ? section.description.trim() : "No description", // Ensures description is always included
+          description: section.description !== undefined ? section.description.trim() : "No description",
           questions: (section.elements || []).map(el => ({
               text: el.text || el.question || "Untitled Question",
               type: el.type || "text",
+              isrequired: el.isrequired, // Ensure isrequired is passed correctly
               options: (el.options || []).map(opt => ({ text: opt || "" }))
           })),
       }));
@@ -44,17 +47,24 @@ function AddSurvey() {
           });
   
           console.log(response.data.message);
+  
+          // Save the token if it exists
+          const token = localStorage.getItem("token");
+          
+          // Clear all localStorage except the token
+          localStorage.clear();
+          if (token) {
+              localStorage.setItem("token", token);
+          }
+  
+          alert("Survey saved successfully!");
+          setFormData(null); // This will clear form builder if it supports reset
+          navigate("/managesurvey");
       } catch (error) {
           console.error("Error saving survey:", error.response?.data || error.message);
           alert(error.response?.data?.message || "Failed to save the survey.");
       }
   };
-  
-  
-  
-  
-  
-  
 
     return (
       <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

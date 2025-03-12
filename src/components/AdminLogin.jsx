@@ -1,62 +1,72 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "../Admin.css"; 
-import logo from "../images/logo.png"
+import { useAuth } from "../context/authContext";
+import logo from "../images/logo.png";
+
 const AdminLogin = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const { setUser } = useAuth();
+  const navigate = useNavigate();
 
-    const handleLogin = (e) => {
-        e.preventDefault();
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("http://localhost:5000/api/login", {
+        username,
+        password,
+      });
 
-        const validEmail = "user@example.com";
-        const validPassword = "123";
+      const { token, user } = response.data;
 
-        if (email === validEmail && password === validPassword) {
-            navigate("/dashboard"); // Redirect to dashboard or homepage
-        } else {
-            setError("Invalid email or password.");
-        }
-    };
+      // Save token to localStorage
+      localStorage.setItem("token", token);
 
-    return (
-        <div className="login-container">
-            <div className="login-box">
-            <img src={logo} alt="logo" className="logo" />
-                {/* <div className="logo">
-                    <img src={logo} alt="logo" className="logo" />
-                </div> */}
-                <p> Log in to continue </p>
-                
-                <form onSubmit={handleLogin}>
-                <div className="input-group">
-                    <label className="label">Email:</label>
-                    <input
-                        type="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="input-group">
-                    <label className="label">Password:</label>
-                    <input
-                        type="password"
-                        placeholder="Enter your password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </div>
-                {error && <p className="error">{error}</p>}
-                <button type="submit">Login</button>
-            </form>
-            </div>
-        </div>
-    );
+      // Set user in auth context
+      setUser(user);
+
+      // Navigate to dashboard
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Login failed:", err);
+      setError(err.response?.data?.error || "Login failed");
+    }
+  };
+
+  return (
+    <div className="login-container">
+      <div className="login-box">
+        <img src={logo} alt="logo" className="logo" />
+        <p>Log in to continue</p>
+        <form onSubmit={handleLogin}>
+        <div className="input-group">
+                        <label className="label">Username:</label>
+                        <input
+                            type="text"
+                            placeholder="Enter your username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="input-group">
+                        <label className="label">Password:</label>
+                        <input
+                            type="password"
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+          {error && <p className="error">{error}</p>}
+          <button type="submit">Login</button>
+        </form>
+      </div>
+    </div>
+  );
 };
 
 export default AdminLogin;

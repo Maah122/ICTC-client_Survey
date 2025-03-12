@@ -55,10 +55,33 @@ const ManageUser = () => {
     setCurrentUser(user);
     setShowModal(true);
   };
-  const saveUserRights = () => {
-    setUsers(users.map((user) => (user.id === currentUser.id ? currentUser : user)));
-    setShowModal(false);
+
+  const saveUserRights = async () => {
+    try {
+      const payload = {
+        user_rights: currentUser.rights,
+      };
+  
+      if (currentUser.rights === "Limited") {
+        payload.offices = currentUser.offices || [];
+      }
+  
+      await axios.put(
+        `http://localhost:5000/api/update-user-rights/${currentUser.id}`,
+        payload
+      );
+  
+      // Update the local state with the new user info
+      setUsers(users.map((user) => user.id === currentUser.id ? { ...user, rights: currentUser.rights, office: payload.offices?.join(", ") } : user));
+  
+      alert("User rights updated successfully!");
+      setShowModal(false);
+    } catch (error) {
+      console.error("Error saving user rights:", error);
+      alert("Failed to update user rights.");
+    }
   };
+  
   const addOffice = () => {
     if (selectedOffice && !currentUser?.offices?.includes(selectedOffice)) {
       setCurrentUser({
@@ -88,9 +111,14 @@ const ManageUser = () => {
   const goToAddUserPage = () => {
     navigate("/add-user");
   };
+  
   const removeOffice = (office) => {
-    setSelectedOffice(selectedOffice.filter((o) => o !== office));
-  };
+  setCurrentUser({
+    ...currentUser,
+    offices: currentUser.offices.filter((o) => o !== office),
+  });
+};
+
 
   const filteredUsers = users.filter((user) =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -163,7 +191,7 @@ const ManageUser = () => {
                     </button> */}
                     <i id="delete-btn"class="bi bi-pencil-square" style = {{ cursor: 'pointer'}} onClick={() => navigate("/edit-user", { state: { user } })} ></i>
                     <i id="edit-btn" class="bi bi-trash" style={{ cursor: 'pointer', color: 'red' }} onClick={() => deleteUser(user.id)} ></i>
-                    <i class="bi bi-gear" style={{ cursor: 'pointer' }} onClick={() => handleUserRightsChange(user)}></i>
+                    {/* <i class="bi bi-gear" style={{ cursor: 'pointer' }} onClick={() => handleUserRightsChange(user)}></i> */}
 
                   </td>
                 </tr>

@@ -42,7 +42,7 @@ const AddUser = () => {
 
   const addUser = async () => {
     // Validation logic
-    if (!newUser.name || !newUser.email || !newUser.username || !newUser.password || !newUser.office || !userRights) {
+    if (!newUser.name || !newUser.email || !newUser.username || !newUser.password || !userRights) {
       alert("All fields are required. Please fill out the form completely.");
       return;
     }
@@ -60,7 +60,6 @@ const AddUser = () => {
         email: newUser.email,
         username: newUser.username,
         password: newUser.password,
-        office: newUser.office,
         userRights
       });
       setSuccessMessage("User Added Successfully!");
@@ -134,24 +133,6 @@ const AddUser = () => {
                     placeholder="Enter password"
                     required
                   />
-                </div>
-
-                <div className="form-group mt-3">
-                  <label htmlFor="office">Select Office</label>
-                  <select
-                    name="office"
-                    value={newUser.office}
-                    onChange={handleInputChange}
-                    className="form-control"
-                    required
-                  >
-                    <option value="">Select Office</option>
-                    {officeOptions.map((office) => (
-                      <option key={office.id} value={office.officeName}>
-                        {office.officeName}
-                      </option>
-                    ))}
-                  </select>
                 </div>
 
                 <div className="form-group mt-3">

@@ -111,6 +111,17 @@ const surveyController = {
             return res.status(500).json({ message: "Internal server error", error: error.message }); // Send error details in response
         }
     },    
+
+    deleteSurvey: async (req, res) => {
+        try {
+            const { surveyId } = req.params; // Get survey ID from request parameters
+            const result = await Survey.deleteSurvey(surveyId);
+            res.status(200).json(result);
+        } catch (error) {
+            console.error("Error deleting survey:", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
 };
 
 module.exports = surveyController;

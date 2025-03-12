@@ -226,7 +226,7 @@ const OfficeSurvey = () => {
         // }
     
         // Trim and convert roleType to lowercase
-        roleType.trim().toLowerCase();
+        // roleType.trim().toLowerCase();
     
         console.log("Submitting with these answers:", {
             survey_id: selectedSurveyId,

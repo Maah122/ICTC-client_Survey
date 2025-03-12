@@ -27,25 +27,59 @@ const formElements = [
 ];
 
 export default function FormsBuilder({ onSave }) {  // Accept onSave prop
-  const [form, setForm] = useState([
-    { id: 1, type: "section", title: "Section 1", description: "Enter section description...", elements: [] }
-  ]);
-
-
-
+  const getInitialFormData = () => {
+    const saved = localStorage.getItem("formBuilderData");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return parsed.sections || [
+          { id: 1, type: "section", title: "", description: "", elements: [] }
+        ];
+      } catch (e) {
+        console.error("Failed to parse localStorage data:", e);
+      }
+    }
+    return [{ id: 1, type: "section", title: "", description: "", elements: [] }];
+  };
+  
+  const [form, setForm] = useState(getInitialFormData);  
   const [currentPreviewSection, setCurrentPreviewSection] = useState(0);
   const [activeSection, setActiveSection] = useState(1);
   const [showPreview, setShowPreview] = useState(false);
-  const [formTitle, setFormTitle] = useState("New Form Title");
-  const [formDescription, setFormDescription] = useState("Form description...");
+  const [formTitle, setFormTitle] = useState(() => {
+    const saved = localStorage.getItem("formBuilderData");
+    return saved ? JSON.parse(saved).surveyTitle || "" : "";
+  });
+  const [formDescription, setFormDescription] = useState(() => {
+    const saved = localStorage.getItem("formBuilderData");
+    return saved ? JSON.parse(saved).surveyDescription || "" : "";
+  });
 
   useEffect(() => {
-    onSave({ surveyTitle: formTitle, surveyDescription: formDescription, sections: form });
-  }, [form, formTitle, formDescription, onSave]);  
+    const dataToSave = {
+      surveyTitle: formTitle,
+      surveyDescription: formDescription,
+      sections: form
+    };
+    localStorage.setItem("formBuilderData", JSON.stringify(dataToSave));
+    if (onSave) onSave(dataToSave);
+  }, [form, formTitle, formDescription]); // Removed onSave   
+
+  useEffect(() => {
+  const saved = localStorage.getItem("formBuilderData");
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    setFormTitle(parsed.surveyTitle || "");
+    setFormDescription(parsed.surveyDescription || "");
+    setForm(parsed.sections || []);
+  }
+}, []);
+
+  
   
   const addSection = () => {
     const newSectionId = form.length + 1;
-    setForm([...form, { id: newSectionId, type: "section", title: `Section ${newSectionId}`, description: "Enter section description...", elements: [] }]);
+    setForm([...form, { id: newSectionId, type: "section", title: ``, description: "", elements: [] }]);
   };
 
   const addElement = () => {
@@ -61,7 +95,7 @@ export default function FormsBuilder({ onSave }) {  // Accept onSave prop
                 text: "",  
                 options: [], 
                 placeholder: "Enter text...", 
-                required: false 
+                isrequired: false
               }
             ] 
         }
@@ -117,7 +151,7 @@ export default function FormsBuilder({ onSave }) {  // Accept onSave prop
         ? { 
             ...section, 
             elements: section.elements.map((el, i) => 
-              i === index ? { ...el, options: [...el.options, `Option ${el.options.length + 1}`] } : el
+              i === index ? { ...el, options: [...el.options, ``] } : el
             )
           }
         : section
@@ -132,6 +166,15 @@ export default function FormsBuilder({ onSave }) {  // Accept onSave prop
   const removeSection = (sectionId) => {
   setForm(form.filter(section => section.id !== sectionId));
 };
+
+const resetForm = () => {
+  localStorage.removeItem("formBuilderData");
+  setForm([{ id: 1, type: "section", title: "", description: "", elements: [] }]);
+  setFormTitle("");
+  setFormDescription("");
+  setShowPreview(false); // Optionally hide the preview modal
+};
+
 
   return (
     <div className="form-builder-container">
@@ -153,6 +196,7 @@ export default function FormsBuilder({ onSave }) {  // Accept onSave prop
       <Button onClick={addSection} className="add-section-button">Add Section</Button>
       <Button onClick={addElement} className="add-question-button">Add Question</Button>
       <Button onClick={previewForm} className="preview-button">Preview Form</Button> {/* New Preview Button */}
+      <Button onClick={resetForm} className="reset-form-button">Reset Form</Button>
 
       {/* Form Builder */}
       <div className="form-elements">
@@ -202,11 +246,11 @@ export default function FormsBuilder({ onSave }) {  // Accept onSave prop
 
                     {/* Toggle Required Button */}
                     <Button 
-                        onClick={() => updateField(section.id, index, "required", !el.required)} 
-                        className={`toggle-required-button ${el.required ? 'active' : ''}`}
-                    >
-                        {el.required ? "Required" : "Optional"}
-                    </Button>
+                        onClick={() => updateField(section.id, index, "isrequired", !el.isrequired)} 
+                        className={`toggle-required-button ${el.isrequired ? 'active' : ''}`}
+                      >
+                        {el.isrequired ? "Required" : "Optional"}
+                      </Button>
                     </div>
                   <div className="question-type-container">
                     <input

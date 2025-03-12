@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useSearchParams, useNavigate } from "react-router-dom";
 import Navbar from '../global/NavBar';
 import AdminSidebar from '../global/AdminSideBar';
 import FormsBuilder from './editformbuilder';
@@ -7,31 +7,29 @@ import './AddSurvey.css';
 import axios from 'axios';
 
 function EditSurvey() {
-  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const survey = location.state?.survey || null; // Get survey data if available
-  const [updatedSurvey, setUpdatedSurvey] = useState(survey);
+  
+  // Get surveyId from URL search params
+  const surveyId = searchParams.get("surveyId");
+  const [updatedSurvey, setUpdatedSurvey] = useState(null);
 
-  useEffect(() => {
-    if (survey) {
-      setUpdatedSurvey(survey);
-    }
-  }, [survey]);
+  console.log("Received survey ID from search params:", surveyId);
 
-  const handleUpdate = async () => {
-    if (!updatedSurvey || !updatedSurvey.id) {
+  const handleUpdate = async (surveyData) => {
+    if (!surveyData || !surveyData.id) {
       alert("Survey ID is required!");
       return;
     }
   
     // Validate sections and questions
-    if (!updatedSurvey.sections || updatedSurvey.sections.length === 0) {
+    if (!surveyData.sections || surveyData.sections.length === 0) {
       alert("At least one section is required!");
       return;
     }
   
     // Check each section for valid questions
-    for (let section of updatedSurvey.sections) {
+    for (let section of surveyData.sections) {
       if (!section.title || section.title.trim() === "") {
         alert("Each section must have a title.");
         return;
@@ -44,12 +42,12 @@ function EditSurvey() {
       }
     }
   
-    console.log("Sending Survey Data:", updatedSurvey); // Log the data to see what's being sent
+    console.log("Sending Survey Data:", JSON.stringify(surveyData, null, 2));
     
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/surveys/update/1`,
-        updatedSurvey,
+        `http://localhost:5000/api/surveys/update/${surveyData.id}`,
+        surveyData,
         {
           headers: {
             "Content-Type": "application/json"
@@ -57,6 +55,10 @@ function EditSurvey() {
         }
       );
       console.log("Response Data:", response.data);
+
+      // Optionally, give feedback or reset the form
+      alert("Survey saved successfully!");
+      navigate("/managesurvey");
     } catch (error) {
       console.error("Error Response Data:", error.response?.data);
       alert("An error occurred while updating the survey: " + (error.response?.data.message || error.message));
@@ -72,10 +74,12 @@ function EditSurvey() {
           <div className="d-flex justify-content-between align-items-center mb-3 survey-header">
             <h2 className="font-inter">Edit Survey</h2>
             <div className="button-container"> 
-              <button className="btn me-10" onClick={handleUpdate}>Save Form</button>
+              <button className="btn me-10" onClick={() => handleUpdate(updatedSurvey)}>Save Form</button>
             </div>
           </div>
-          <FormsBuilder surveyData={updatedSurvey} setSurveyData={setUpdatedSurvey} style={{ flex: 1 }} />
+          {surveyId && (
+            <FormsBuilder surveyId={surveyId} setSurveyData={setUpdatedSurvey} style={{ flex: 1 }} />
+          )}
         </div>
       </div>
     </div>

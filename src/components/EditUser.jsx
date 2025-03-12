@@ -1,28 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../global/NavBar";
 import AdminSidebar from "../global/AdminSideBar";
 import './AddUser.css';
 import axios from 'axios';
 
-const officeOptions = [
-  { id: 1, officeName: "Accounting Division" },
-  { id: 2, officeName: "Alumni and Endowment Fund Center" },
-  { id: 3, officeName: "CED - Integrated Development School" },
-  { id: 4, officeName: "Center for Advanced Education and Lifelong Learning" },
-  { id: 5, officeName: "Center for Information and Communication Technology" },
-  { id: 6, officeName: "College of Education" },
-  { id: 7, officeName: "Hostel" },
-  { id: 8, officeName: "HR Management Division" },
-  { id: 9, officeName: "Infrastructure Services Division" },
-  { id: 10, officeName: "Knowledge and Technology Transfer Office" },
-  { id: 11, officeName: "Legal Services Office" },
-  { id: 12, officeName: "MSU-IIT Center for Resiliency" },
-];
-
 const EditUser = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [officeOptions, setOfficeOptions] = useState([]);
   const { user } = location.state || {};
 
   const [editedUser, setEditedUser] = useState(user || {
@@ -37,6 +23,20 @@ const EditUser = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedOffices, setSelectedOffices] = useState(user?.offices || []);
   const [selectedOffice, setSelectedOffice] = useState("");
+
+  const fetchOffices = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/offices");
+      console.log("Fetched offices:", response.data); // ← Add this line
+      setOfficeOptions(response.data);
+    } catch (err) {
+      console.error("Error loading offices:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchOffices(); // Call the fetch function for offices
+  }, []);
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -50,11 +50,13 @@ const EditUser = () => {
   };
 
   const addOffice = () => {
-    if (selectedOffice && !selectedOffices.includes(selectedOffice)) {
-      setSelectedOffices([...selectedOffices, selectedOffice]);
+    const office = officeOptions.find(o => o.name === selectedOffice);
+    if (office && !selectedOffices.some(o => o.id === office.id)) {
+      setSelectedOffices([...selectedOffices, office]);
       setSelectedOffice("");
     }
   };
+  
 
   const removeOffice = (office) => {
     setSelectedOffices(selectedOffices.filter((o) => o !== office));
@@ -66,11 +68,16 @@ const EditUser = () => {
         name: editedUser.name,
         email: editedUser.email,
         password: editedUser.password,
-        userRights: userRights
+        user_rights: userRights,
       };
+      
+      if (userRights === "Limited") {
+        updatedUser.offices = selectedOffices.map(o => o.id);
+      }    
+      console.log("Updating user with ID:", editedUser.id);
   
       const response = await axios.put(
-        `http://localhost:5000/api/updateuser/${editedUser.id}`, 
+        `http://localhost:5000/api/update-user/${editedUser.id}`,
         updatedUser
       );
   
@@ -82,11 +89,11 @@ const EditUser = () => {
       alert("Failed to update user. Please try again.");
     }
   };
+  
 
   const saveUserRights = () => {
-    console.log("User rights updated for selected offices:", selectedOffices);
-    setShowModal(false);
-  };
+    setShowModal(false); // We just close the modal here
+  };  
 
   return (
     <div>
@@ -154,7 +161,7 @@ const EditUser = () => {
                       <ul>
                         {selectedOffices.map((office, index) => (
                           <li key={index}>
-                            {office}
+                            {office.name}
                             <i id="add-btn"className="bi bi-trash" style={{ cursor: 'pointer' }} onClick={() => removeOffice(office)}></i>
                           </li>
                         ))}
@@ -183,7 +190,7 @@ const EditUser = () => {
                 <select className="form-control" value={selectedOffice} onChange={(e) => setSelectedOffice(e.target.value)}>
                   <option value="">Select Office</option>
                   {officeOptions.map((office) => (
-                    <option key={office.id} value={office.officeName}>{office.officeName}</option>
+                    <option key={office.id} value={office.name}>{office.name}</option>
                   ))}
                 </select>
                 <button className="btn btn-success mt-3" onClick={addOffice}>Add Office</button>

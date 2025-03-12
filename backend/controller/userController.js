@@ -1,17 +1,19 @@
 // controllers/userController.js
-const { createUser, pool } = require("../model/userModel"); 
+const jwt = require('jsonwebtoken');
+const { createUser, pool, findUserByUsername, updateUser, updateUserRights } = require("../model/userModel"); 
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // Use env in production
 
 const addUser = async (req, res) => {
-  const { name, email, username, password, office, userRights } = req.body;
+  const { name, email, username, password, userRights } = req.body;
 
   console.log("Received data:", req.body);
 
-  if (!name || !email || !username || !password || !office || !userRights) {
+  if (!name || !email || !username || !password || !userRights) {
     return res.status(400).json({ error: "All fields are required" });
   }
 
   try {
-    const newUser = await createUser({ name, email, username, password, office, userRights });
+    const newUser = await createUser({ name, email, username, password, userRights });
     res.status(201).json({ message: "User added successfully", user: newUser });
   } catch (error) {
     console.error(error);
@@ -30,31 +32,47 @@ const getUsers = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch users" });
   }
 };
-// Update User
-const updateUser = async (req, res) => {
-  const { id } = req.params;
-  const { name, email, password, userRights } = req.body;
+
+const updateUserController = async (req, res) => {
+  const userId = req.params.id;
+  const { name, email, password, user_rights, offices } = req.body;
+
+  console.log("Update request payload:", req.body);
 
   try {
-    const query = `UPDATE "CSS".users 
-                   SET name = $1, email = $2, password = $3, user_rights = $4 
-                   WHERE id = $5 RETURNING *`;
+    const updatedUser = await updateUser(userId, {
+      name,
+      email,
+      password,
+      user_rights,
+      offices,
+    });
 
-    const values = [name, email, password, userRights, id];
-
-    const result = await pool.query(query, values);
-
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    res.status(200).json({ message: "User updated successfully", user: result.rows[0] });
+    res.status(200).json({ message: 'User updated successfully', user: updatedUser });
   } catch (error) {
-    console.error("Error updating user:", error);
-    res.status(500).json({ error: "Failed to update user" });
+    console.error('Update error:', error);
+    res.status(500).json({ error: 'Failed to update user' });
   }
 };
 
+const updateUserRightsController = async (req, res) => {
+  const userId = req.params.id;
+  const {user_rights, offices } = req.body;
+
+  console.log("Update request payload:", req.body);
+
+  try {
+    const updatedUser = await updateUserRights(userId, {
+      user_rights,
+      offices,
+    });
+
+    res.status(200).json({ message: 'User updated successfully', user: updatedUser });
+  } catch (error) {
+    console.error('Update error:', error);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+};
 
 // Delete User
 const deleteUser = async (req, res) => {
@@ -75,4 +93,49 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { addUser, getUsers, updateUser, deleteUser };
+const login = async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const user = await findUserByUsername(username);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Compare plaintext password (use bcrypt in production!)
+    if (user.password !== password) {
+      return res.status(401).json({ error: 'Invalid password' });
+    }
+
+    // Create JWT payload
+    const payload = {
+      id: user.id,
+      username: user.username,
+      user_rights: user.user_rights,
+      office: user.office
+    };
+
+    // Sign token
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '2h' });
+
+    // Send token and user info
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        office: user.office,
+        user_rights: user.user_rights
+      }
+    });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+module.exports = { addUser, getUsers, updateUserController, updateUserRightsController, deleteUser, login};

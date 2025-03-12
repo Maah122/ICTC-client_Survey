@@ -1,5 +1,16 @@
 const pool = require("../db");
 
+// Fetch all responses for a specific survey
+const getResponsesBySurvey = async (surveyId) => {
+    const query = `
+        SELECT * FROM "CSS".response
+        WHERE survey_id = $1;
+    `;
+    const values = [surveyId];
+    const result = await pool.query(query, values);
+    return result.rows;
+};
+
 // Insert response into the response table and return the inserted ID
 const insertResponse = async (survey_id, office_id, type, role, sex, age, region, comment, email, phone) => {
     const query = `
@@ -40,10 +51,23 @@ const insertAnswers = async (answers, responseId) => {
             console.error("Error inserting answer:", error.message);
             throw error; // Rethrow the error to handle it in the calling function
         }
-    }
+    };
+};
+
+// Fetch responses by officeId and surveyId
+const getResponsesByOfficeAndSurvey = async (officeId, surveyId) => {
+    const query = `
+        SELECT * FROM "CSS".response
+        WHERE office_id = $1 AND survey_id = $2;
+    `;
+    const values = [officeId, surveyId];
+    const result = await pool.query(query, values);
+    return result.rows;
 };
 
 module.exports = {
+    getResponsesBySurvey,
     insertResponse,
-    insertAnswers
+    insertAnswers,
+    getResponsesByOfficeAndSurvey
 };

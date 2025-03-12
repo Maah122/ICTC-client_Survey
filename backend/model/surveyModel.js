@@ -12,7 +12,7 @@
                 `SELECT s.id as survey_id, s.title as survey_title, s.description as survey_description, 
                         s.status as survey_status, 
                         sec.id as section_id, sec.title as section_title, sec.description as section_description,
-                        q.id as question_id, q.text as question_text, q.type as question_type,
+                        q.id as question_id, q.text as question_text, q.type as question_type, q.isrequired as question_required,
                         o.id as option_id, o.text as option_text
                 FROM "CSS".survey s
                 LEFT JOIN "CSS".section sec ON s.id = sec.survey_id
@@ -50,6 +50,7 @@
                         id: row.question_id,
                         text: row.question_text,
                         type: row.question_type,
+                        required: row.question_required,
                         options: [],
                     };
                     section.questions.push(question);
@@ -88,9 +89,10 @@
         
                     for (const question of section.questions) {
                         const questionResult = await client.query(
-                            'INSERT INTO "CSS".question (section_id, text, type) VALUES ($1, $2, $3) RETURNING id',
-                            [sectionId, question.text || "Untitled Question", question.type]
+                            'INSERT INTO "CSS".question (section_id, text, type, isrequired) VALUES ($1, $2, $3, $4) RETURNING id',
+                            [sectionId, question.text || "Untitled Question", question.type, question.isrequired] // Ensure isrequired is passed
                         );
+                        console.log(questionResult);
                         const questionId = questionResult.rows[0].id;
                     
                         for (const option of question.options || []) {
@@ -224,9 +226,9 @@
         updateSurveyDetails: async (surveyId, title, description, sections) => {
             const client = await pool.connect();
             try {
-                await client.query("BEGIN"); // Start transaction
+                await client.query("BEGIN");
         
-                // ✅ Update the survey details (without updating status)
+                // ✅ Update survey
                 await client.query(
                     `UPDATE "CSS".survey 
                      SET title = $1, description = $2
@@ -234,10 +236,24 @@
                     [title, description, surveyId]
                 );
         
-                // ✅ Update or insert sections, questions, and options
+                // ✅ Fetch existing section IDs from DB
+                const existingSectionsRes = await client.query(
+                    `SELECT id FROM "CSS".section WHERE survey_id = $1`,
+                    [surveyId]
+                );
+                const existingSectionIds = existingSectionsRes.rows.map(row => row.id);
+        
+                const incomingSectionIds = sections.filter(s => s.id).map(s => s.id);
+                const sectionIdsToDelete = existingSectionIds.filter(id => !incomingSectionIds.includes(id));
+        
+                // ❌ Delete removed sections (this should cascade if FK is set properly)
+                for (const sectionId of sectionIdsToDelete) {
+                    await client.query(`DELETE FROM "CSS".section WHERE id = $1`, [sectionId]);
+                }
+        
                 for (const section of sections) {
                     let sectionId = section.id;
-                    
+        
                     if (sectionId) {
                         // Update existing section
                         await client.query(
@@ -256,6 +272,20 @@
                         sectionId = sectionResult.rows[0].id;
                     }
         
+                    // ✅ Fetch existing questions for the section
+                    const existingQuestionsRes = await client.query(
+                        `SELECT id FROM "CSS".question WHERE section_id = $1`,
+                        [sectionId]
+                    );
+                    const existingQuestionIds = existingQuestionsRes.rows.map(row => row.id);
+                    const incomingQuestionIds = section.questions.filter(q => q.id).map(q => q.id);
+                    const questionIdsToDelete = existingQuestionIds.filter(id => !incomingQuestionIds.includes(id));
+        
+                    // ❌ Delete removed questions
+                    for (const questionId of questionIdsToDelete) {
+                        await client.query(`DELETE FROM "CSS".question WHERE id = $1`, [questionId]);
+                    }
+        
                     for (const question of section.questions) {
                         let questionId = question.id;
         
@@ -263,18 +293,32 @@
                             // Update existing question
                             await client.query(
                                 `UPDATE "CSS".question 
-                                 SET text = $1, type = $2 
-                                 WHERE id = $3`,
-                                [question.text, question.type, questionId]
+                                 SET text = $1, type = $2, isrequired = $3 
+                                 WHERE id = $4`,
+                                [question.text, question.type, question.isrequired, questionId] // Include isRequired
                             );
                         } else {
                             // Insert new question
                             const questionResult = await client.query(
-                                `INSERT INTO "CSS".question (section_id, text, type) 
-                                 VALUES ($1, $2, $3) RETURNING id`,
-                                [sectionId, question.text, question.type]
+                                `INSERT INTO "CSS".question (section_id, text, type, isrequired) 
+                                 VALUES ($1, $2, $3, $4) RETURNING id`,
+                                [sectionId, question.text, question.type, question.isrequired] // Include isRequired
                             );
                             questionId = questionResult.rows[0].id;
+                        }
+        
+                        // ✅ Fetch existing options for the question
+                        const existingOptionsRes = await client.query(
+                            `SELECT id FROM "CSS".option WHERE question_id = $1`,
+                            [questionId]
+                        );
+                        const existingOptionIds = existingOptionsRes.rows.map(row => row.id);
+                        const incomingOptionIds = question.options.filter(o => o.id).map(o => o.id);
+                        const optionIdsToDelete = existingOptionIds.filter(id => !incomingOptionIds.includes(id));
+        
+                        // ❌ Delete removed options
+                        for (const optionId of optionIdsToDelete) {
+                            await client.query(`DELETE FROM "CSS".option WHERE id = $1`, [optionId]);
                         }
         
                         for (const option of question.options) {
@@ -298,16 +342,69 @@
                     }
                 }
         
-                await client.query("COMMIT"); // Commit transaction
+                await client.query("COMMIT");
                 return { id: surveyId, title, description };
             } catch (error) {
-                await client.query("ROLLBACK"); // Rollback on error
+                await client.query("ROLLBACK");
                 console.error("Error updating survey details:", error);
                 throw error;
             } finally {
                 client.release();
             }
-        },        
+        },              
+
+        deleteSurvey: async (surveyId) => {
+            const client = await pool.connect();
+            try {
+                await client.query("BEGIN"); // Start transaction
+        
+                // First, delete all options related to questions in the survey
+                await client.query(
+                    `DELETE FROM "CSS".option 
+                     WHERE question_id IN (
+                         SELECT id FROM "CSS".question 
+                         WHERE section_id IN (
+                             SELECT id FROM "CSS".section 
+                             WHERE survey_id = $1
+                         )
+                     )`,
+                    [surveyId]
+                );
+        
+                // Then, delete all questions related to sections in the survey
+                await client.query(
+                    `DELETE FROM "CSS".question 
+                     WHERE section_id IN (
+                         SELECT id FROM "CSS".section 
+                         WHERE survey_id = $1
+                     )`,
+                    [surveyId]
+                );
+        
+                // Next, delete all sections related to the survey
+                await client.query(
+                    `DELETE FROM "CSS".section 
+                     WHERE survey_id = $1`,
+                    [surveyId]
+                );
+        
+                // Finally, delete the survey itself
+                await client.query(
+                    `DELETE FROM "CSS".survey 
+                     WHERE id = $1`,
+                    [surveyId]
+                );
+        
+                await client.query("COMMIT"); // Commit transaction
+                return { message: "Survey deleted successfully." };
+            } catch (error) {
+                await client.query("ROLLBACK"); // Rollback on error
+                console.error("Error deleting survey:", error);
+                throw error;
+            } finally {
+                client.release();
+            }
+        }
     }
 
     module.exports = Survey;
