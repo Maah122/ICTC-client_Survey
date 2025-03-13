@@ -38,7 +38,7 @@
     "Supply and Property Management Division": "SPMD",
     "University Library": "UL",
     "WE CARE Office": "WECARE"
-  };  
+  };
 
   const CustomTooltip = ({ active, payload, coordinate }) => {
     if (active && payload && payload.length) {

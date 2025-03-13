@@ -139,7 +139,7 @@ const OfficeSurvey = () => {
             // Validate questions in the current section
             const currentSection = sections[step - 2]; // Adjust for zero-based index
             currentSection.questions.forEach(question => {
-                if (question.isRequired && !responses[question.id]) {
+                if (question.required && !responses[question.id]) {
                     errors[question.id] = true; // Mark as error if required question is not answered
                 }
             });
@@ -147,6 +147,7 @@ const OfficeSurvey = () => {
         setValidationErrors(errors);
         return Object.keys(errors).length === 0; // Return true if no errors
     };
+
    
     const handleNext = () => {
         if (validateStep()) {
@@ -160,7 +161,15 @@ const OfficeSurvey = () => {
         }
     };
 
-    const handleBack = () => setStep(step - 1);
+    const handleBack = () => {
+        if (step === 1) {
+            // Navigate to /clientsurvey if on step 1
+            navigate("/clientsurvey");
+        } else {
+            // Go back to the previous step
+            setStep(step - 1);
+        }
+    };
 
     const handleAnswerChange = (questionId, value) => {
         setResponses((prev) => ({ ...prev, [questionId]: value }));
@@ -188,6 +197,8 @@ const OfficeSurvey = () => {
     };
 
     const handleSubmit = async () => {
+        
+        
         console.log("Submitting with these answers:", {
             survey_id: selectedSurveyId,
             office_id: selectedOfficeId,
@@ -579,6 +590,11 @@ const OfficeSurvey = () => {
 
             {/* Navigation Buttons */}
             <div className="button-container">
+                {step === 1 && (
+                    <button className="back-button" onClick={handleBack}>
+                        Back
+                    </button>
+                )}
                 {step > 1 && (
                     <button className="back-button" onClick={handleBack}>
                         Back
@@ -591,7 +607,11 @@ const OfficeSurvey = () => {
                 ) : (
                     <button 
                         className="next-button" 
-                        onClick={handleSubmit} 
+                        onClick={() => {
+                            if (validateStep()) {
+                                setIsModalOpen(true); // Open the modal if validation passes
+                            }
+                        }} 
                     >
                         Submit
                     </button>

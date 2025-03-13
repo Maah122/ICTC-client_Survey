@@ -157,12 +157,12 @@ const EditUser = () => {
                   {userRights === "Limited" && (
                     <div className="mt-3">
                       <label>Selected Offices:</label>
-                      <i id="add-btn"className="bi bi-plus-circle" style={{ cursor: 'pointer' }} onClick={() => setShowModal(true)}></i>
+                      <i id="add-btn" style={{ cursor: 'pointer', textDecoration: 'none', fontStyle: 'normal', textAlign: 'center', lineHeight: '1', width: '80px', height: '30px'}} onClick={() => setShowModal(true)}>+ Add</i>
                       <ul>
                         {selectedOffices.map((office, index) => (
                           <li key={index}>
                             {office.name}
-                            <i id="add-btn"className="bi bi-trash" style={{ cursor: 'pointer' }} onClick={() => removeOffice(office)}></i>
+                            <i id="add-btn" style={{ cursor: 'pointer', textDecoration: 'none', fontStyle: 'normal', textAlign: 'center' }} onClick={() => removeOffice(office)}> - Remove</i>
                           </li>
                         ))}
                       </ul>

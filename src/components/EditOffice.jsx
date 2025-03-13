@@ -31,12 +31,12 @@ const EditOffice = () => {
       // Fetch office details (only name)
       axios.get(`http://localhost:5000/api/offices/${office.id}`)
         .then(res => {
-          setOfficeName(res.data.office); // Ensure the API returns { office: "Office Name" }
+          setOfficeName(res.data.office || ""); // Ensure the API returns { office: "Office Name" }
         })
         .catch(err => console.error("Error fetching office name:", err));
   
       // Fetch services separately
-      axios.get(`http://localhost:5000/api/office/${office.id}/services`)
+      axios.get(`http://localhost:5000/api/offices/${office.id}/services`)
         .then(res => {
           setServices(res.data); // Ensure API returns a list of services
         })
@@ -47,7 +47,7 @@ const EditOffice = () => {
 
   // Add or edit service
   const handleService = () => {
-    if (!newService.trim()) return;
+    if (!newService?.trim()) return;
 
     if (editType === "service" && editIndex !== null) {
       const updatedServices = [...services];
@@ -97,7 +97,7 @@ const EditOffice = () => {
 
   // Add or edit personnel
   const handlePersonnel = () => {
-    if (!newPersonnel.trim()) return;
+    if (!newPersonnel?.trim()) return;
 
     if (editType === "personnel" && editIndex !== null) {
       const updatedPersonnel = [...personnel];
@@ -149,7 +149,7 @@ const EditOffice = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!officeName.trim()) {
+    if (!officeName?.trim()) {
       alert("Office name cannot be empty!");
       return;
     }
@@ -190,6 +190,7 @@ const EditOffice = () => {
   // Change page for personnel
   const paginatePersonnel = (pageNumber) => setCurrentPersonnelPage(pageNumber);
 
+
   return (
     <div>
       <Navbar />
@@ -213,7 +214,7 @@ const EditOffice = () => {
 
             {/* Services */}
             <div className="mb-3">
-              <label className="form-label">Service Availability</label>
+              <label className="form-label">Service</label>
               <div className="d-flex">
                 <input
                   type="text"
@@ -252,7 +253,7 @@ const EditOffice = () => {
 
             {/* Personnel */}
             <div className="mb-3">
-              <label className="form-label">Personnel You Transacted With</label>
+              <label className="form-label">Personnel</label>
               <div className="d-flex">
                 <input
                   type="text"

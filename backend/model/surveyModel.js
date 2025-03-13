@@ -69,53 +69,53 @@
         },
                 
 
-        createSurveyWithQuestions: async (title, description, sections) => {
-            const client = await pool.connect();
-            try {
-                await client.query("BEGIN"); // Start transaction
-        
-                // Insert the survey
-                const surveyResult = await client.query(
-                    'INSERT INTO "CSS".survey (title, description) VALUES ($1, $2) RETURNING id',
-                    [title, description]
-                );
-                const surveyId = surveyResult.rows[0].id;
-        
-                for (const section of sections) {
-                    const sectionResult = await client.query(
-                        'INSERT INTO "CSS".section (survey_id, title, description) VALUES ($1, $2, $3) RETURNING id',
-                        [surveyId, section.title, section.description || "No description"]
+            createSurveyWithQuestions: async (title, description, sections) => {
+                const client = await pool.connect();
+                try {
+                    await client.query("BEGIN"); // Start transaction
+            
+                    // Insert the survey
+                    const surveyResult = await client.query(
+                        'INSERT INTO "CSS".survey (title, description) VALUES ($1, $2) RETURNING id',
+                        [title, description]
                     );
-                    const sectionId = sectionResult.rows[0].id;
-        
-                    for (const question of section.questions) {
-                        const questionResult = await client.query(
-                            'INSERT INTO "CSS".question (section_id, text, type, isrequired) VALUES ($1, $2, $3, $4) RETURNING id',
-                            [sectionId, question.text || "Untitled Question", question.type, question.isrequired] // Ensure isrequired is passed
+                    const surveyId = surveyResult.rows[0].id;
+            
+                    for (const section of sections) {
+                        const sectionResult = await client.query(
+                            'INSERT INTO "CSS".section (survey_id, title, description) VALUES ($1, $2, $3) RETURNING id',
+                            [surveyId, section.title, section.description || "No description"]
                         );
-                        console.log(questionResult);
-                        const questionId = questionResult.rows[0].id;
-                    
-                        for (const option of question.options || []) {
-                            if (option.text.trim() !== "") { // Ensure text is not empty
-                                await client.query(
-                                    'INSERT INTO "CSS".option (question_id, text) VALUES ($1, $2)',
-                                    [questionId, option.text]
-                                );
+                        const sectionId = sectionResult.rows[0].id;
+            
+                        for (const question of section.questions) {
+                            const questionResult = await client.query(
+                                'INSERT INTO "CSS".question (section_id, text, type, isrequired) VALUES ($1, $2, $3, $4) RETURNING id',
+                                [sectionId, question.text || "Untitled Question", question.type, question.isrequired] // Ensure isrequired is passed
+                            );
+                            console.log(questionResult);
+                            const questionId = questionResult.rows[0].id;
+                        
+                            for (const option of question.options || []) {
+                                if (option.text.trim() !== "") { // Ensure text is not empty
+                                    await client.query(
+                                        'INSERT INTO "CSS".option (question_id, text) VALUES ($1, $2)',
+                                        [questionId, option.text]
+                                    );
+                                }
                             }
-                        }
-                    }                    
+                        }                    
+                    }
+            
+                    await client.query("COMMIT"); // Commit transaction
+                    return { id: surveyId, title, description };
+                } catch (error) {
+                    await client.query("ROLLBACK"); // Rollback on error
+                    throw error;
+                } finally {
+                    client.release();
                 }
-        
-                await client.query("COMMIT"); // Commit transaction
-                return { id: surveyId, title, description };
-            } catch (error) {
-                await client.query("ROLLBACK"); // Rollback on error
-                throw error;
-            } finally {
-                client.release();
-            }
-        },            
+            },            
         
         // In your surveyController.js
         getAllSurveysWithSections: async (req, res) => {

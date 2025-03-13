@@ -535,7 +535,7 @@ input[type="checkbox"]:checked {
   background-color: #870d0d;
   margin-right: auto; /* Pushes the Back button to the far left */
   margin-bottom: 50px;
-  visibility: hidden; /* Initially hides the Back button */
+  visibility: visible; /* Initially hides the Back button */
   position: relative;
   left: 35px;
 }
