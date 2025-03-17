@@ -159,7 +159,7 @@ const ManageUser = () => {
                 </option>
               ))}
             </select>
-            <button id="add-btn" className="btn btn-primary" onClick={goToAddUserPage}>
+            <button id="add-user-btn" className="btn btn-primary" onClick={goToAddUserPage}>
               Add User
             </button>
           </div>

@@ -34,7 +34,12 @@ h2 {
   text-align: center;
   margin-bottom: 20px;
 }
-
+#add-user-btn{
+  background-color: #870D0D;
+  width: 15%;
+  font-weight: bold;
+  border-style: none;
+}
 .form-container {
   display: flex;
   gap: 10px;
@@ -57,10 +62,26 @@ h2 {
   width: 40%;
   margin: 0;
 }
-#add-btn{
-  width: 10%;
-  font-size: 13px;
+
+#add-office-btn {
+  text-decoration: none;
+  font-weight: normal;
+  font-style: normal;
+  float: right;
+  cursor: pointer;
+  font-size: 15px;
+  margin-left: 10px;  /* Adds spacing from text */
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;  /* Space between icon and text */
 }
+#edit-save-btn{
+  background-color: #870D0D;
+  width: 15%;
+  font-weight: bold;
+  border-style: none;
+}
+
 #edit-btn , #delete-btn{
   margin-right: 10px; 
 }
@@ -316,3 +337,4 @@ th {
     overflow: hidden;
   }
 }
+
