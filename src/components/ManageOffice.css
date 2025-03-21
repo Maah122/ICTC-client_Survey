@@ -1,0 +1,248 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    flex: 1;
+    padding: 20px;
+}
+
+h4 {
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Search Bar and Add Office Button */
+.search-container {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-container input {
+    flex: 1;
+    min-width: 200px;
+}
+
+.btn-add-office {
+    background-color: rgb(135, 13, 13);
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    color: white;
+    white-space: nowrap; /* Prevents text wrapping */
+    transition: 0.3s ease-in-out;
+}
+
+.btn-add-office:hover {
+    background-color: rgb(100, 10, 10);
+}
+
+/* ========================= */
+/* ===== TABLE STYLES ===== */
+/* ========================= */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Allows horizontal scrolling on small screens */
+    display: block;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px; /* Prevents extreme shrinking */
+}
+
+th, td {
+    padding: 12px; /* Increased padding for better readability */
+    text-align: left;
+    border: 1px solid #ddd;
+    font-size: 16px; /* Ensures text is readable */
+}
+
+th {
+    background-color: #343a40;
+    color: white;
+    font-size: 17px;
+}
+
+/* Action Icons */
+.action-icons {
+    display: flex;
+    gap: 15px;
+}
+
+.action-icons i {
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.action-icons .edit-icon {
+    color: #007bff;
+}
+
+.action-icons .delete-icon {
+    color: red;
+}
+ul{
+    padding: 0;
+}
+ ul li{
+    list-style-type: none;
+}
+/* ========================= */
+/* ===== PC Layout (≥1024px) ===== */
+/* ========================= */
+@media (min-width: 1024px) {
+    .search-container {
+        flex-direction: row;
+    }
+
+    .btn-add-office {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+
+    table {
+        font-size: 16px;
+    }
+}
+
+/* ========================= */
+/* ===== Tablet Layout (768px - 1023px) ===== */
+/* ========================= */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .search-container {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .btn-add-office {
+        font-size: 15px;
+        padding: 10px 18px;
+    }
+
+    table {
+        font-size: 15px;
+    }
+}
+
+/* ========================= */
+/* ===== Mobile Layout (≤767px) ===== */
+/* ========================= */
+@media (max-width: 767px) {
+    .search-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .btn-add-office {
+        width: 100%;
+        text-align: center;
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    table {
+        min-width: 700px; /* Prevents table from shrinking too much */
+    }
+
+    th, td {
+        font-size: 14px; /* Slightly smaller for compact view */
+        padding: 10px;
+    }
+}
+
+
+/* Ensure table spans the full width */
+.table-container {
+    width: 100vw; /* Full viewport width */
+    max-width: 100%; /* Prevent overflow */
+    overflow-x: auto; /* Allows horizontal scrolling when needed */
+    display: block;
+}
+
+/* Table now spans full width */
+table {
+    width: 100%; /* Ensures it takes full width */
+    border-collapse: collapse;
+}
+
+/* Improve readability */
+th, td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+/* Mobile Layout (≤767px) */
+@media (max-width: 767px) {
+    .table-container {
+        width: 100%;
+    }
+
+    table {
+        width: 100%; /* Ensure it takes the full screen */
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 10px;
+    }
+}
+
+@media (min-width: 414px) {
+    .table-responsive {
+      min-width: 95%;
+    }
+  }
+
+
+
+  /* Pagination Styles */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.pagination-button {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.pagination-button.active {
+    background-color: #870d0d; /* Red when active */
+    color: white;
+}
+
+.pagination-button.disabled {
+    background-color: #6c757d; /* Gray when disabled */
+    color: white;
+    cursor: not-allowed;
+}
+
+/* Adjust spacing for the page count display */
+.page-info {
+    font-size: 16px;
+    font-weight: bold;
+}
