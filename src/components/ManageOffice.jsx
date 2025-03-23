@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import Navbar from "../global/NavBar";
 import AdminSidebar from "../global/AdminSideBar";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -10,56 +9,56 @@ const ManageOffice = () => {
   const [offices, setOffices] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
+  const officesPerPage = 20;
+  const [expandedOffice, setExpandedOffice] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch offices with services and personnel
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-          const response = await fetch("http://localhost:5000/api/offices");
-          const data = await response.json();
-          setOffices(data); // ✅ Update state with latest data
-      } catch (error) {
-          console.error("Error fetching offices:", error);
-      }
+  // ✅ Fetch latest offices from localStorage
+  const fetchOffices = () => {
+    const storedOffices = JSON.parse(localStorage.getItem("offices")) || [];
+    setOffices(storedOffices);
   };
 
-    fetchData();
+  useEffect(() => {
+    fetchOffices(); // ✅ Fetch data on mount
+
+    // ✅ Listen for changes in localStorage (force refresh when edited)
+    const handleStorageChange = () => {
+      fetchOffices();
+    };
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
-  // Delete Office
-  const deleteOffice = async (id) => {
+  const deleteOffice = (id) => {
     if (window.confirm("Are you sure you want to delete this office?")) {
-      try {
-        await axios.delete(`http://localhost:5000/api/offices/${id}`);
-        setOffices((prevOffices) => prevOffices.filter((office) => office.id !== id));
-      } catch (error) {
-        console.error("Error deleting office:", error);
-      }
+      const updatedOffices = offices.filter((office) => office.id !== id);
+      localStorage.setItem("offices", JSON.stringify(updatedOffices));
+      setOffices(updatedOffices);
     }
   };
 
-  // Navigate to Add Office Page
-  const goToAddOfficePage = () => {
-    navigate("/add-office");
-  };
-
-  // Navigate to Edit Office Page
   const goToEditOfficePage = (office) => {
     navigate("/edit-office", { state: { office } });
   };
 
-  // Filter offices by search
+  const toggleOfficeDetails = (id) => {
+    setExpandedOffice(expandedOffice === id ? null : id);
+  };
+
+  // ✅ Updated Search Algorithm (Searches office name + officeCode)
   const filteredOffices = offices.filter((office) =>
-    office.name.toLowerCase().includes(searchTerm.toLowerCase())
+    office.office.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (office.officeCode && office.officeCode.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  // Calculate pagination
-  const totalPages = Math.ceil(filteredOffices.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const displayedOffices = filteredOffices.slice(startIndex, startIndex + itemsPerPage);
-
+  const totalPages = Math.ceil(filteredOffices.length / officesPerPage);
+  const indexOfLastOffice = currentPage * officesPerPage;
+  const indexOfFirstOffice = indexOfLastOffice - officesPerPage;
+  const currentOffices = filteredOffices.slice(indexOfFirstOffice, indexOfLastOffice);
 
   return (
     <div>
@@ -72,94 +71,166 @@ const ManageOffice = () => {
             <input
               type="text"
               className="form-control w-auto flex-grow-1"
-              placeholder="Search Office"
+              placeholder="Search Office or Office Code"
               value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1); // Reset to first page when searching
-              }}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <button className="btn btn-add-office" onClick={goToAddOfficePage}>
-              Add Office
-            </button>
           </div>
-
-          {/* Table */}
-          <table className="table table-striped table-bordered">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Office</th>
-                <th>Services</th>
-                <th>Personnel</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayedOffices.map((office) => (
-                <tr key={office.id}>
-                  <td>{office.id}</td>
-                  <td>{office.name}</td>
-                  <td>
-                      <div className="scrollable-container">
-                        {office.services?.length ? (
-                          office.services.map((service, index) => (
-                            <div key={index} className="mb-1">{service.name}</div>
-                          ))
-                        ) : (
-                          <div>N/A</div>
-                        )}
-                      </div>
-                    </td>
-                    <td>
-                      <div className="scrollable-container">
-                        {office.personnel?.length ? (
-                          office.personnel.map((person, index) => (
-                            <div key={index} className="mb-1">{person.name}</div>
-                          ))
-                        ) : (
-                          <div>N/A</div>
-                        )}
-                      </div>
-                    </td>
-
-                  <td>
-                    <i
-                      className="bi bi-pencil-square"
-                      style={{ cursor: "pointer", marginRight: "10px" }}
-                      onClick={() => goToEditOfficePage(office)}
-                    />
-                    <i
-                      className="bi bi-trash"
-                      style={{ cursor: "pointer", color: "red" }}
-                      onClick={() => deleteOffice(office.id)}
-                    />
-                  </td>
+          <div className="table-responsive" style={{ minWidth: "95%" }}>
+            <table className="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Office Code</th> {/* ✅ Reads the updated officeCode */}
+                  <th>Office</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {currentOffices.map((office) => (
+                  <React.Fragment key={office.id}>
+                    <tr>
+                      <td>{office.id}</td>
+                      <td>{office.officeCode || "N/A"}</td> {/* ✅ Uses 'officeCode' */}
+                      <td
+                        style={{
+                          cursor: "pointer",
+                          textDecoration: "underline",
+                          fontWeight: "bold",
+                          color: "black",
+                        }}
+                        onClick={() => toggleOfficeDetails(office.id)}
+                      >
+                        {office.office}
+                      </td>
+                      <td>
+                        <i
+                          className="bi bi-pencil-square"
+                          style={{ cursor: "pointer", marginRight: "10px" }}
+                          onClick={() => goToEditOfficePage(office)}
+                        />
+                        <i
+                          className="bi bi-trash"
+                          style={{ cursor: "pointer"}}
+                          onClick={() => deleteOffice(office.id)}
+                        />
+                      </td>
+                    </tr>
 
-          {/* Pagination */}
-          <div className="d-flex justify-content-center mt-3">
-            <button
-              className="btn btn-primary mx-1"
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            <span className="align-self-center mx-2">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              className="btn btn-primary mx-1"
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
+                    {expandedOffice === office.id && (
+                      <tr>
+                        <td colSpan="4">
+                          <div className="row">
+                            <div className="col">
+                              <h5>Service Availability</h5>
+                              <table className="table table-bordered">
+                                <tbody>
+                                  {office.services.length > 0 ? (
+                                    office.services.map((service, index) => (
+                                      <tr key={index}>
+                                        <td>{service}</td>
+                                      </tr>
+                                    ))
+                                  ) : (
+                                    <tr>
+                                      <td>No services listed</td>
+                                    </tr>
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                            <div className="col">
+                              <h5>Personnel You Transacted With</h5>
+                              <table className="table table-bordered">
+                                <tbody>
+                                  {office.personnel.length > 0 ? (
+                                    office.personnel.map((person, index) => (
+                                      <tr key={index}>
+                                        <td>{person}</td>
+                                      </tr>
+                                    ))
+                                  ) : (
+                                    <tr>
+                                      <td>No personnel listed</td>
+                                    </tr>
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
           </div>
+
+            {/* Pagination (Hidden if only one page) */}
+            {totalPages > 1 && (
+              <nav>
+                <ul className="pagination justify-content-center">
+
+                  {/* Previous Button (Hidden if on the first page) */}
+                  {currentPage > 1 && (
+                    <li className="page-item">
+                      <button className="page-link" onClick={() => setCurrentPage(currentPage - 1)}>
+                        Previous
+                      </button>
+                    </li>
+                  )}
+
+                  {/* First Page */}
+                  {currentPage > 4 && (
+                    <>
+                      <li className="page-item">
+                        <button className="page-link" onClick={() => setCurrentPage(1)}>1</button>
+                      </li>
+                      <li className="page-item disabled">
+                        <span className="page-link">...</span>
+                      </li>
+                    </>
+                  )}
+
+                  {/* Dynamic Middle Pages */}
+                  {Array.from({ length: 5 }, (_, i) => currentPage - 2 + i)
+                    .filter((p) => p > 0 && p <= totalPages)
+                    .map((p) => (
+                      <li key={p} className={`page-item ${currentPage === p ? "active" : ""}`}>
+                        <button className="page-link" onClick={() => setCurrentPage(p)}>
+                          {p}
+                        </button>
+                      </li>
+                    ))}
+
+                  {/* Last Page */}
+                  {currentPage < totalPages - 3 && (
+                    <>
+                      <li className="page-item disabled">
+                        <span className="page-link">...</span>
+                      </li>
+                      <li className="page-item">
+                        <button className="page-link" onClick={() => setCurrentPage(totalPages)}>
+                          {totalPages}
+                        </button>
+                      </li>
+                    </>
+                  )}
+
+                  {/* Next Button (Hidden if on the last page) */}
+                  {currentPage < totalPages && (
+                    <li className="page-item">
+                      <button className="page-link" onClick={() => setCurrentPage(currentPage + 1)}>
+                        Next
+                      </button>
+                    </li>
+                  )}
+
+                </ul>
+              </nav>
+            )}
+
         </div>
       </div>
     </div>

@@ -1,208 +1,139 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../global/NavBar";
-import axios from "axios";
 import AdminSidebar from "../global/AdminSideBar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import "./AddOffice.css"; // Reusing the same CSS
+import "./AddOffice.css";
+import "./EditOffice.css";
+
+const ITEMS_PER_PAGE = 20;
 
 const EditOffice = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const office = location.state?.office || null;
+  const { office } = location.state || {};
 
-  const [officeName, setOfficeName] = useState(office?.name || "");
+  const [officeCode, setOfficeCode] = useState(office?.officeCode || "");
+  const [officeName, setOfficeName] = useState(office?.office || "");
   const [services, setServices] = useState(office?.services || []);
-  const [personnel, setPersonnel] = useState(office?.personnel || []);  
+  const [personnel, setPersonnel] = useState(office?.personnel || []);
   const [newService, setNewService] = useState("");
   const [newPersonnel, setNewPersonnel] = useState("");
+  const [showServices, setShowServices] = useState(true);
+  const [showPersonnel, setShowPersonnel] = useState(true);
+  const toggleServices = () => setShowServices(!showServices);
+  const togglePersonnel = () => setShowPersonnel(!showPersonnel);
+
+
   const [editIndex, setEditIndex] = useState(null);
   const [editType, setEditType] = useState("");
+  const [editValue, setEditValue] = useState("");
 
   // Pagination state
-  const [currentServicePage, setCurrentServicePage] = useState(1);
-  const [servicesPerPage] = useState(5); // Number of services per page
-  const [currentPersonnelPage, setCurrentPersonnelPage] = useState(1);
-  const [personnelPerPage] = useState(5); // Number of personnel per page
+  const [servicePage, setServicePage] = useState(1);
+  const [personnelPage, setPersonnelPage] = useState(1);
 
   useEffect(() => {
-    if (office?.id) {
-      // Fetch office details (only name)
-      axios.get(`http://localhost:5000/api/offices/${office.id}`)
-        .then(res => {
-          setOfficeName(res.data.office || ""); // Ensure the API returns { office: "Office Name" }
-        })
-        .catch(err => console.error("Error fetching office name:", err));
-  
-      // Fetch services separately
-      axios.get(`http://localhost:5000/api/offices/${office.id}/services`)
-        .then(res => {
-          setServices(res.data); // Ensure API returns a list of services
-        })
-        .catch(err => console.error("Error fetching services:", err));
+    if (!office) {
+      navigate("/manageoffice");
     }
-  }, [office]);
-  
+  }, [office, navigate]);
 
-  // Add or edit service
-  const handleService = () => {
-    if (!newService?.trim()) return;
+  const startEditing = (type, index, value) => {
+    setEditType(type);
+    setEditIndex(index);
+    setEditValue(value);
+  };
 
-    if (editType === "service" && editIndex !== null) {
+  const handleEditChange = (e) => {
+    setEditValue(e.target.value);
+  };
+
+  const saveEdit = () => {
+    if (editType === "service") {
       const updatedServices = [...services];
-      const serviceId = updatedServices[editIndex].id; // Get the ID of the service being edited
-
-      // Update the service in the backend
-      axios.put(`http://localhost:5000/api/offices/${office.id}/services/${serviceId}`, {
-        serviceName: newService.trim(),
-      })
-      .then(() => {
-        updatedServices[editIndex].name = newService.trim(); // Update the local state
-        setServices(updatedServices);
-        setEditIndex(null);
-        setEditType("");
-      })
-      .catch((error) => {
-        console.error("Error updating service:", error);
-        alert("Failed to update service.");
-      });
-    } else {
-      setServices([...services, newService.trim()]);
-    }
-
-    setNewService("");
-  };
-
-  // Edit existing service
-  const editService = (index) => {
-    setNewService(services[index].name); // Set the name for editing
-    setEditIndex(index);
-    setEditType("service");
-  };
-
-  // Delete service
-  const removeService = (index) => {
-    const serviceId = services[index].id; // Get the ID of the service to delete
-
-    axios.delete(`http://localhost:5000/api/offices/${office.id}/services/${serviceId}`)
-      .then(() => {
-        setServices(services.filter((_, i) => i !== index)); // Update local state
-      })
-      .catch((error) => {
-        console.error("Error deleting service:", error);
-        alert("Failed to delete service.");
-      });
-  };
-
-  // Add or edit personnel
-  const handlePersonnel = () => {
-    if (!newPersonnel?.trim()) return;
-
-    if (editType === "personnel" && editIndex !== null) {
+      updatedServices[(servicePage - 1) * ITEMS_PER_PAGE + editIndex] = editValue.trim();
+      setServices(updatedServices);
+    } else if (editType === "personnel") {
       const updatedPersonnel = [...personnel];
-      const personnelId = updatedPersonnel[editIndex].id; // Get the ID of the personnel being edited
-
-      // Update the personnel in the backend
-      axios.put(`http://localhost:5000/api/offices/${office.id}/personnel/${personnelId}`, {
-        personnelName: newPersonnel.trim(),
-      })
-      .then(() => {
-        updatedPersonnel[editIndex].name = newPersonnel.trim(); // Update the local state
-        setPersonnel(updatedPersonnel);
-        setEditIndex(null);
-        setEditType("");
-      })
-      .catch((error) => {
-        console.error("Error updating personnel:", error);
-        alert("Failed to update personnel.");
-      });
-    } else {
-      setPersonnel([...personnel, newPersonnel.trim()]);
+      updatedPersonnel[(personnelPage - 1) * ITEMS_PER_PAGE + editIndex] = editValue.trim();
+      setPersonnel(updatedPersonnel);
     }
-
-    setNewPersonnel("");
+    cancelEdit();
   };
 
-  // Edit existing personnel
-  const editPersonnel = (index) => {
-    setNewPersonnel(personnel[index].name); // Set the name for editing
-    setEditIndex(index);
-    setEditType("personnel");
+  const cancelEdit = () => {
+    setEditIndex(null);
+    setEditType("");
+    setEditValue("");
   };
 
-  // Delete personnel
-  const removePersonnel = (index) => {
-    const personnelId = personnel[index].id; // Get the ID of the personnel to delete
-
-    axios.delete(`http://localhost:5000/api/offices/${office.id}/personnel/${personnelId}`)
-      .then(() => {
-        setPersonnel(personnel.filter((_, i) => i !== index)); // Update local state
-      })
-      .catch((error) => {
-        console.error("Error deleting personnel:", error);
-        alert("Failed to delete personnel.");
-      });
+  const handleAddService = () => {
+    if (newService.trim()) {
+      setServices([...services, newService.trim()]);
+      setNewService("");
+    }
   };
 
-  // Handle form submission
-  const handleSubmit = async (e) => {
+  const handleAddPersonnel = () => {
+    if (newPersonnel.trim()) {
+      setPersonnel([...personnel, newPersonnel.trim()]);
+      setNewPersonnel("");
+    }
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!officeName?.trim()) {
+    if (!officeName.trim()) {
       alert("Office name cannot be empty!");
       return;
     }
 
-    try {
-      if (!office?.id) {
-        alert("Invalid office data.");
-        return;
-      }
+    const existingOffices = JSON.parse(localStorage.getItem("offices")) || [];
 
-      await axios.put(`http://localhost:5000/api/offices/${office.id}`, {
-        office: officeName,
-        services,
-        personnel,
-      });
+    const updatedOffices = existingOffices.map((o) =>
+      o.id === office.id
+        ? { ...o, officeCode: officeCode, office: officeName, services, personnel }
+        : o
+    );
 
-      alert("Office updated successfully!");
-      navigate("/manageoffice");
-    } catch (error) {
-      console.error("Error updating office:", error);
-      alert("Failed to update office.");
-    }
+    localStorage.setItem("offices", JSON.stringify(updatedOffices));
+    navigate("/manageoffice");
   };
 
-  // Pagination logic for services
-  const indexOfLastService = currentServicePage * servicesPerPage;
-  const indexOfFirstService = indexOfLastService - servicesPerPage;
-  const currentServices = services.slice(indexOfFirstService, indexOfLastService);
+  // Pagination Helpers
+  const paginate = (items, page) => items.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+  const totalPages = (items) => Math.ceil(items.length / ITEMS_PER_PAGE);
 
-  // Pagination logic for personnel
-  const indexOfLastPersonnel = currentPersonnelPage * personnelPerPage;
-  const indexOfFirstPersonnel = indexOfLastPersonnel - personnelPerPage;
-  const currentPersonnel = personnel.slice(indexOfFirstPersonnel, indexOfLastPersonnel);
-
-  // Change page for services
-  const paginateServices = (pageNumber) => setCurrentServicePage(pageNumber);
-
-  // Change page for personnel
-  const paginatePersonnel = (pageNumber) => setCurrentPersonnelPage(pageNumber);
-
+  
 
   return (
-    <div>
+    <div className="edit-overlay">
       <Navbar />
       <div className="d-flex">
-        <AdminSidebar />
+      <AdminSidebar />
+
         <div className="container mt-4">
           <form onSubmit={handleSubmit} className="add-office-form">
             <h4>Edit Office</h4>
 
+            {/* Office Code */}
+            <div className="mb-3">
+              <label className="form-label">Office Code</label>
+              <input
+                type="text"
+                className="form-control"
+                value={officeCode}
+                onChange={(e) => setOfficeCode(e.target.value)}
+                required
+              />
+            </div>
+
             {/* Office Name */}
             <div className="mb-3">
-              <label htmlFor="officeName" className="form-label"></label>
+              <label className="form-label">Office Name</label>
               <input
                 type="text"
                 className="form-control"
@@ -212,88 +143,346 @@ const EditOffice = () => {
               />
             </div>
 
-            {/* Services */}
-            <div className="mb-3">
-              <label className="form-label">Service</label>
-              <div className="d-flex">
-                <input
-                  type="text"
-                  className="form-control me-2"
-                  placeholder="Enter service"
-                  value={newService}
-                  onChange={(e) => setNewService(e.target.value)}
-                />
-                <button type="button" className="btn btn-add" onClick={handleService}>
-                  {editType === "service" ? "Update" : "+ Add"}
-                </button>
-              </div>
-              <ul className="list-group mt-2">
-                {currentServices.map((service, index) => (
-                  <li key={index} className="list-group-item d-flex justify-content-between">
-                    {service.name}
-                    <div>
-                      <i className="bi bi-pencil-square text-primary me-2" style={{ cursor: "pointer" }} onClick={() => editService(index + indexOfFirstService)} />
-                      <i className="bi bi-trash text-danger" style={{ cursor: "pointer" }} onClick={() => removeService(index + indexOfFirstService)} />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <nav>
-                <ul className="pagination">
-                  {Array.from({ length: Math.ceil(services.length / servicesPerPage) }, (_, i) => (
-                    <li key={i} className={`page-item ${currentServicePage === i + 1 ? 'active' : ''}`}>
-                      <button className="page-link" onClick={() => paginateServices(i + 1)}>
- {i + 1}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            </div>
+{/* Services Section */}
+<div className="mb-3">
+  <div className="d-flex justify-content-between align-items-center">
+    <label className="form-label">Service Availability</label>
+    <button
+      type="button"
+      className="btn btn-sm btn-outline-secondary"
+      onClick={toggleServices}
+    >
+      {showServices ? "▼ Hide" : "▶ Show"}
+    </button>
+  </div>
 
-            {/* Personnel */}
-            <div className="mb-3">
-              <label className="form-label">Personnel</label>
-              <div className="d-flex">
-                <input
-                  type="text"
-                  className="form-control me-2"
-                  placeholder="Enter personnel name"
-                  value={newPersonnel}
-                  onChange={(e) => setNewPersonnel(e.target.value)}
-                />
-                <button type="button" className="btn btn-add" onClick={handlePersonnel}>
-                  {editType === "personnel" ? "Update" : "+ Add"}
-                </button>
-              </div>
-              <ul className="list-group mt-2">
-                {currentPersonnel.map((person, index) => (
-                  <li key={index} className="list-group-item d-flex justify-content-between">
-                    {person.name}
-                    <div>
-                      <i className="bi bi-pencil-square text-primary me-2" style={{ cursor: "pointer" }} onClick={() => editPersonnel(index + indexOfFirstPersonnel)} />
-                      <i className="bi bi-trash text-danger" style={{ cursor: "pointer" }} onClick={() => removePersonnel(index + indexOfFirstPersonnel)} />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <nav>
-                <ul className="pagination">
-                  {Array.from({ length: Math.ceil(personnel.length / personnelPerPage) }, (_, i) => (
-                    <li key={i} className={`page-item ${currentPersonnelPage === i + 1 ? 'active' : ''}`}>
-                      <button className="page-link" onClick={() => paginatePersonnel(i + 1)}>
-                        {i + 1}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            </div>
+   <br></br> 
+  {showServices && (
+    <>
+      <div className="d-flex">
+        <input
+          type="text"
+          className="form-control me-2"
+          placeholder="Enter service"
+          value={newService}
+          onChange={(e) => setNewService(e.target.value)}
+        />
+        <button type="button" className="btn btn-add" onClick={handleAddService}>
+           Add
+        </button>
+      </div>
 
-            {/* Submit Button */}
-            <button type="submit" className="btn btn-add-office">
-              Update
+      <ul className="list-group mt-2">
+        {paginate(services, servicePage).map((service, index) => (
+          <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+            {editIndex === index && editType === "service" ? (
+              <>
+                <input type="text" className="form-control" value={editValue} onChange={handleEditChange} autoFocus />
+                <button 
+                className="btn btn-sm ms-2" 
+                style={{ backgroundColor: "#870d0d", color: "white" }} 
+                onClick={saveEdit}
+              >
+                Save
+              </button>
+
+              <button 
+                className="btn btn-sm ms-2" 
+                style={{ backgroundColor: "gray", color: "white" }} 
+                onClick={cancelEdit}
+              >
+                Cancel
+              </button>
+              </>
+            ) : (
+              <>
+                <span>{service}</span>
+                <i
+                  className="bi bi-pencil-square text-dark me-2"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => startEditing("service", index, service)}
+                />
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
+
+        <div>
+{/* Services Section Pagination */}
+{totalPages(services) > 1 && (
+  <nav>
+    <ul className="pagination justify-content-center">
+      {/* Previous Button (Hidden if only 1 page) */}
+      {totalPages(services) > 1 && servicePage > 1 && (
+        <li className="page-item">
+          <button 
+            className="page-link" 
+            onClick={(e) => {
+              e.preventDefault();
+              setServicePage(servicePage - 1);
+            }}
+          >
+            Previous
+          </button>
+        </li>
+      )}
+
+      {/* First Page */}
+      <li className={`page-item ${servicePage === 1 ? "active" : ""}`}>
+        <button 
+          className="page-link" 
+          onClick={(e) => {
+            e.preventDefault();
+            setServicePage(1);
+          }}
+        >
+          1
+        </button>
+      </li>
+
+      {/* Left Ellipsis */}
+      {servicePage > 4 && (
+        <li className="page-item disabled">
+          <span className="page-link">...</span>
+        </li>
+      )}
+
+      {/* Middle Pages */}
+      {Array.from({ length: 4 }, (_, i) => servicePage - 1 + i)
+        .filter((p) => p > 1 && p < totalPages(services))
+        .map((p) => (
+          <li key={p} className={`page-item ${servicePage === p ? "active" : ""}`}>
+            <button 
+              className="page-link" 
+              onClick={(e) => {
+                e.preventDefault();
+                setServicePage(p);
+              }}
+            >
+              {p}
             </button>
+          </li>
+        ))}
+
+      {/* Right Ellipsis */}
+      {servicePage < totalPages(services) - 4 && (
+        <li className="page-item disabled">
+          <span className="page-link">...</span>
+        </li>
+      )}
+
+      {/* Last Page */}
+      {totalPages(services) > 1 && (
+        <li className={`page-item ${servicePage === totalPages(services) ? "active" : ""}`}>
+          <button 
+            className="page-link" 
+            onClick={(e) => {
+              e.preventDefault();
+              setServicePage(totalPages(services));
+            }}
+          >
+            {totalPages(services)}
+          </button>
+        </li>
+      )}
+
+      {/* Next Button (Hidden if only 1 page) */}
+      {totalPages(services) > 1 && servicePage < totalPages(services) && (
+        <li className="page-item">
+          <button 
+            className="page-link" 
+            onClick={(e) => {
+              e.preventDefault();
+              setServicePage(servicePage + 1);
+            }}
+          >
+            Next
+          </button>
+        </li>
+      )}
+    </ul>
+  </nav>
+)}
+        </div>
+    </>     
+  )}    
+  </div>
+
+       {/* Personnel Section */}
+      <div className="mb-3">
+        <div className="d-flex justify-content-between align-items-center">
+          <label className="form-label">Personnel You Transacted With</label>
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-secondary"
+            onClick={togglePersonnel}
+          >
+            {showPersonnel ? "▼ Hide" : "▶ Show"}
+          </button>
+        </div>
+
+        <br></br>
+        {showPersonnel && (
+          <>
+            <div className="d-flex">
+              <input
+                type="text"
+                className="form-control me-2"
+                placeholder="Enter personnel name"
+                value={newPersonnel}
+                onChange={(e) => setNewPersonnel(e.target.value)}
+              />
+              <button type="button" className="btn btn-add" onClick={handleAddPersonnel}>
+                Add
+              </button>
+            </div>
+
+            <ul className="list-group mt-2">
+              {paginate(personnel, personnelPage).map((person, index) => (
+                <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+                  {editIndex === index && editType === "personnel" ? (
+                    <>
+                      <input type="text" className="form-control" value={editValue} onChange={handleEditChange} autoFocus />
+                      <button 
+                      className="btn btn-sm ms-2" 
+                      style={{ backgroundColor: "#870d0d", color: "white" }} 
+                      onClick={saveEdit}
+                    >
+                      Save
+                    </button>
+
+                    <button 
+                      className="btn btn-sm ms-2" 
+                      style={{ backgroundColor: "gray", color: "white" }} 
+                      onClick={cancelEdit}
+                    >
+                      Cancel
+                    </button>
+                    </>
+                  ) : (
+                    <>
+                      <span>{person}</span>
+                      <i
+                        className="bi bi-pencil-square text-dark me-2"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => startEditing("personnel", index, person)}
+                      />
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+
+            {/* Personnel Section Pagination */}
+            {totalPages(personnel) > 1 && (
+              <nav>
+                <ul className="pagination justify-content-center">
+                  {/* Previous Button (Hidden if only 1 page) */}
+                  {totalPages(personnel) > 1 && personnelPage > 1 && (
+                    <li className="page-item">
+                      <button 
+                        className="page-link" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPersonnelPage(personnelPage - 1);
+                        }}
+                      >
+                        Previous
+                      </button>
+                    </li>
+                  )}
+
+                  {/* First Page */}
+                  <li className={`page-item ${personnelPage === 1 ? "active" : ""}`}>
+                    <button 
+                      className="page-link" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setPersonnelPage(1);
+                      }}
+                    >
+                      1
+                    </button>
+                  </li>
+
+                  {/* Left Ellipsis */}
+                  {personnelPage > 4 && (
+                    <li className="page-item disabled">
+                      <span className="page-link">...</span>
+                    </li>
+                  )}
+
+                  {/* Middle Pages */}
+                  {Array.from({ length: 4 }, (_, i) => personnelPage - 1 + i)
+                    .filter((p) => p > 1 && p < totalPages(personnel))
+                    .map((p) => (
+                      <li key={p} className={`page-item ${personnelPage === p ? "active" : ""}`}>
+                        <button 
+                          className="page-link" 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setPersonnelPage(p);
+                          }}
+                        >
+                          {p}
+                        </button>
+                      </li>
+                    ))}
+
+                  {/* Right Ellipsis */}
+                  {personnelPage < totalPages(personnel) - 4 && (
+                    <li className="page-item disabled">
+                      <span className="page-link">...</span>
+                    </li>
+                  )}
+
+                  {/* Last Page */}
+                  {totalPages(personnel) > 1 && (
+                    <li className={`page-item ${personnelPage === totalPages(personnel) ? "active" : ""}`}>
+                      <button 
+                        className="page-link" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPersonnelPage(totalPages(personnel));
+                        }}
+                      >
+                        {totalPages(personnel)}
+                      </button>
+                    </li>
+                  )}
+
+                  {/* Next Button (Hidden if only 1 page) */}
+                  {totalPages(personnel) > 1 && personnelPage < totalPages(personnel) && (
+                    <li className="page-item">
+                      <button 
+                        className="page-link" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPersonnelPage(personnelPage + 1);
+                        }}
+                      >
+                        Next
+                      </button>
+                    </li>
+                  )}
+                </ul>
+              </nav>
+            )}       
+          </>
+        )}
+      </div>
+
+
+            <button type="submit" className="btn btn-add-office">Save Changes</button>
+            <button
+              type="button"
+              className="btn btn-secondary btn-cancel ms-3"
+              onClick={() => navigate("/manageoffice")}
+            >
+              Cancel
+            </button>
+
           </form>
         </div>
       </div>

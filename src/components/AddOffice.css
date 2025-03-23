@@ -40,7 +40,7 @@
 
 /* Add Button */
 .btn-add {
-    background-color: #6c757d;
+    background-color: #870d0d;
     color: white;
     border: none;
     padding: 8px 15px;
@@ -143,7 +143,7 @@
 
     .btn-add, 
     .btn-add-office {
-        width: 100%; /* Full width buttons */
+        width: 40%; /* Full width buttons */
     }
 
     .list-group-item {
@@ -162,4 +162,3 @@
         left: 242px; /* Keep original offset */
     }
 }
-
