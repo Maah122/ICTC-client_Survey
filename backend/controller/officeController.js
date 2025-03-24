@@ -49,39 +49,46 @@ const officeController = {
 
     createOffice: async (req, res) => {
         try {
-            const { office, services, personnel } = req.body;
+            const { office_code, office_name, services, personnel } = req.body;
     
-            if (!office) {
-                return res.status(400).json({ message: "Office name is required" });
+            if (!office_code || !office_name) {
+                return res.status(400).json({ message: "Office code and office name are required" });
             }
     
             // Insert office and get the new office ID
-            const newOffice = await Office.createOffice(office);
+            const newOffice = await Office.createOffice(office_code, office_name);
             const officeId = newOffice.id;
     
             console.log("✅ Office created with ID:", officeId);
     
             // Insert services linked to the office
-            if (services && services.length > 0) {
+            const insertedServices = [];
+            if (Array.isArray(services) && services.length > 0) {
                 for (const service of services) {
-                    console.log("📌 Inserting service:", service);
-                    await Office.createService(officeId, service);
+                    const newService = await Office.createService(officeId, service);
+                    insertedServices.push(newService);
                 }
-            } else {
-                console.log("⚠️ No services provided.");
             }
     
             // Insert personnel linked to the office
-            if (personnel && personnel.length > 0) {
+            const insertedPersonnel = [];
+            if (Array.isArray(personnel) && personnel.length > 0) {
                 for (const person of personnel) {
-                    console.log("📌 Inserting personnel:", person);
-                    await Office.createPersonnel(officeId, person);
+                    const newPersonnel = await Office.createPersonnel(officeId, person);
+                    insertedPersonnel.push(newPersonnel);
                 }
-            } else {
-                console.log("⚠️ No personnel provided.");
             }
     
-            res.status(201).json({ message: "Office created successfully", office: newOffice });
+            res.status(201).json({
+                message: "Office created successfully",
+                office: {
+                    id: officeId,
+                    office_code: office_code,
+                    office_name: office_name
+                },
+                services: insertedServices,
+                personnel: insertedPersonnel
+            });
     
         } catch (error) {
             console.error("❌ Error creating office:", error);
@@ -89,6 +96,7 @@ const officeController = {
         }
     },
     
+
 
     deleteOffice: async (req, res) => {
         const { officeId } = req.params;
@@ -139,39 +147,49 @@ const officeController = {
 
     updateOffice: async (req, res) => {
         const { officeId } = req.params;
-        const { office, services, personnel } = req.body;
+        const { office_code, office_name, services, personnel } = req.body;
     
         try {
+            // Validate inputs
+            if (!office_code || !office_name) {
+                return res.status(400).json({ 
+                    success: false,
+                    message: "Office code and office name are required" 
+                });
+            }
+    
             // Check if the office exists
             const existingOffice = await Office.getOfficeById(officeId);
             if (!existingOffice) {
-                return res.status(404).json({ message: "Office not found" });
+                return res.status(404).json({ 
+                    success: false,
+                    message: "Office not found" 
+                });
             }
     
-            // Update office name
-            await Office.updateOfficeName(officeId, office);
-    
-            // Remove existing services and personnel before inserting new ones
-            if (Array.isArray(services)) {
-                await Office.deleteServicesByOffice(officeId);
-                for (const service of services) {
-                    await Office.createService(officeId, service);
-                }
-            }
-    
-            if (Array.isArray(personnel)) {
-                await Office.deletePersonnelByOffice(officeId);
-                for (const person of personnel) {
-                    await Office.createPersonnel(officeId, person);
-                }
-            }
-    
-            res.json({ message: "Office updated successfully" });
+            // Update office in the database
+            const updatedOffice = await Office.updateOffice(
+                officeId, 
+                office_code, 
+                office_name, 
+                services, 
+                personnel
+            );
+            
+            res.json({
+                success: true,
+                message: "Office updated successfully",
+                data: updatedOffice
+            });
         } catch (error) {
             console.error("❌ Error updating office:", error);
-            res.status(500).json({ message: "Error updating office" });
+            res.status(500).json({ 
+                success: false,
+                message: error.message || "Error updating office" 
+            });
         }
     },
+    
 
     updateService: async (req, res) => {
         const { officeId, serviceId } = req.params;
