@@ -246,3 +246,181 @@ th, td {
     font-size: 16px;
     font-weight: bold;
 }
+
+
+/* Expands modal width for better layout */
+.modal-dialog {
+    max-width: 900px; /* Default width */
+  }
+  
+  /* Makes modal content responsive */
+  .modal-body {
+    overflow-x: auto; /* Enables horizontal scrolling if content is too wide */
+    max-height: 70vh; /* Limits modal height to 70% of viewport height */
+    overflow-y: auto; /* Allows scrolling for large content */
+  }
+  
+  /* Styles the title */
+  .modal-title {
+    font-size: 22px;
+    font-weight: bold;
+    white-space: nowrap; /* Prevents title from wrapping */
+  }
+  
+  /* Styles the office code */
+  .office-code {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000000; /* Bootstrap primary color */
+  }
+  
+  /* Makes table fully responsive */
+  .modal-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+  
+  /* Ensures table responsiveness on small screens */
+  .modal-table-container {
+    overflow-x: auto;
+  }
+  
+  /* Table header */
+  .modal-table th {
+    background-color: #f8f9fa;
+    text-align: center;
+    padding: 10px;
+    font-weight: bold;
+    white-space: nowrap; /* Prevents column headers from wrapping */
+  }
+  
+  /* Table data */
+  .modal-table td {
+    text-align: center;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  /* Adds hover effect on table rows */
+  .modal-table tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Ensures input fields inside the modal do not overflow */
+  .modal-input {
+    width: 100%;
+    max-width: 250px;
+    text-align: center;
+  }
+  
+  /* Button styling */
+  .modal-footer button {
+    padding: 8px 20px;
+    font-size: 16px;
+  }
+  
+  /* 🌟 Responsive Design */
+  @media (max-width: 768px) {
+    .modal-dialog {
+      max-width: 90%; /* Reduces modal width on small screens */
+    }
+  
+    .modal-title {
+      font-size: 18px;
+    }
+  
+    .office-code {
+      font-size: 16px;
+    }
+  
+    .modal-table th,
+    .modal-table td {
+      font-size: 14px;
+      padding: 8px;
+    }
+  
+    .modal-footer button {
+      font-size: 14px;
+      padding: 6px 15px;
+    }
+  }
+  
+/* Custom Modal */
+.manage-office-modal .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%; /* Makes it responsive */
+    max-width: 2000px; /* Ensures it doesn't exceed 2000px */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    margin: auto;
+}
+
+/* Clickable Office Name */
+.office-link {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* Action Icons */
+.action-icon {
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: color 0.2s;
+}
+.action-icon:hover {
+    color: red;
+}
+
+/* Table Adjustments */
+.modal-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.modal-table th,
+.modal-table td {
+    padding: 15px; /* Increased padding for uniform spacing */
+    text-align: left;
+    border: 1px solid #dee2e6;
+}
+
+.modal-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+/* Adjustments for Services & Personnel Columns */
+.modal-table td ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.modal-table td ul li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-table td ul li:last-child {
+    border-bottom: none;
+}
+
+/* Make Modal Responsive */
+@media (max-width: 768px) {
+    .modal-table th,
+    .modal-table td {
+        padding: 10px;
+    }
+
+    .manage-office-modal .modal-content {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .modal-table td ul li {
+        padding: 8px;
+    }
+}
+
