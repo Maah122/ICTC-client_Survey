@@ -1,0 +1,426 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    flex: 1;
+    padding: 20px;
+}
+
+h4 {
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Search Bar and Add Office Button */
+.search-container {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-container input {
+    flex: 1;
+    min-width: 200px;
+}
+
+.btn-add-office {
+    background-color: rgb(135, 13, 13);
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    color: white;
+    white-space: nowrap; /* Prevents text wrapping */
+    transition: 0.3s ease-in-out;
+}
+
+.btn-add-office:hover {
+    background-color: rgb(100, 10, 10);
+}
+
+/* ========================= */
+/* ===== TABLE STYLES ===== */
+/* ========================= */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Allows horizontal scrolling on small screens */
+    display: block;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px; /* Prevents extreme shrinking */
+}
+
+th, td {
+    padding: 12px; /* Increased padding for better readability */
+    text-align: left;
+    border: 1px solid #ddd;
+    font-size: 16px; /* Ensures text is readable */
+}
+
+th {
+    background-color: #343a40;
+    color: white;
+    font-size: 17px;
+}
+
+/* Action Icons */
+.action-icons {
+    display: flex;
+    gap: 15px;
+}
+
+.action-icons i {
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.action-icons .edit-icon {
+    color: #007bff;
+}
+
+.action-icons .delete-icon {
+    color: red;
+}
+ul{
+    padding: 0;
+}
+ ul li{
+    list-style-type: none;
+}
+/* ========================= */
+/* ===== PC Layout (≥1024px) ===== */
+/* ========================= */
+@media (min-width: 1024px) {
+    .search-container {
+        flex-direction: row;
+    }
+
+    .btn-add-office {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+
+    table {
+        font-size: 16px;
+    }
+}
+
+/* ========================= */
+/* ===== Tablet Layout (768px - 1023px) ===== */
+/* ========================= */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .search-container {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .btn-add-office {
+        font-size: 15px;
+        padding: 10px 18px;
+    }
+
+    table {
+        font-size: 15px;
+    }
+}
+
+/* ========================= */
+/* ===== Mobile Layout (≤767px) ===== */
+/* ========================= */
+@media (max-width: 767px) {
+    .search-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .btn-add-office {
+        width: 100%;
+        text-align: center;
+        font-size: 14px;
+        padding: 12px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    table {
+        min-width: 700px; /* Prevents table from shrinking too much */
+    }
+
+    th, td {
+        font-size: 14px; /* Slightly smaller for compact view */
+        padding: 10px;
+    }
+}
+
+
+/* Ensure table spans the full width */
+.table-container {
+    width: 100vw; /* Full viewport width */
+    max-width: 100%; /* Prevent overflow */
+    overflow-x: auto; /* Allows horizontal scrolling when needed */
+    display: block;
+}
+
+/* Table now spans full width */
+table {
+    width: 100%; /* Ensures it takes full width */
+    border-collapse: collapse;
+}
+
+/* Improve readability */
+th, td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+/* Mobile Layout (≤767px) */
+@media (max-width: 767px) {
+    .table-container {
+        width: 100%;
+    }
+
+    table {
+        width: 100%; /* Ensure it takes the full screen */
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 10px;
+    }
+}
+
+@media (min-width: 414px) {
+    .table-responsive {
+      min-width: 95%;
+    }
+  }
+
+
+
+  /* Pagination Styles */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.pagination-button {
+    padding: 10px 15px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.pagination-button.active {
+    background-color: #870d0d; /* Red when active */
+    color: white;
+}
+
+.pagination-button.disabled {
+    background-color: #6c757d; /* Gray when disabled */
+    color: white;
+    cursor: not-allowed;
+}
+
+/* Adjust spacing for the page count display */
+.page-info {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+
+/* Expands modal width for better layout */
+.modal-dialog {
+    max-width: 900px; /* Default width */
+  }
+  
+  /* Makes modal content responsive */
+  .modal-body {
+    overflow-x: auto; /* Enables horizontal scrolling if content is too wide */
+    max-height: 70vh; /* Limits modal height to 70% of viewport height */
+    overflow-y: auto; /* Allows scrolling for large content */
+  }
+  
+  /* Styles the title */
+  .modal-title {
+    font-size: 22px;
+    font-weight: bold;
+    white-space: nowrap; /* Prevents title from wrapping */
+  }
+  
+  /* Styles the office code */
+  .office-code {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000000; /* Bootstrap primary color */
+  }
+  
+  /* Makes table fully responsive */
+  .modal-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+  }
+  
+  /* Ensures table responsiveness on small screens */
+  .modal-table-container {
+    overflow-x: auto;
+  }
+  
+  /* Table header */
+  .modal-table th {
+    background-color: #f8f9fa;
+    text-align: center;
+    padding: 10px;
+    font-weight: bold;
+    white-space: nowrap; /* Prevents column headers from wrapping */
+  }
+  
+  /* Table data */
+  .modal-table td {
+    text-align: center;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  /* Adds hover effect on table rows */
+  .modal-table tbody tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Ensures input fields inside the modal do not overflow */
+  .modal-input {
+    width: 100%;
+    max-width: 250px;
+    text-align: center;
+  }
+  
+  /* Button styling */
+  .modal-footer button {
+    padding: 8px 20px;
+    font-size: 16px;
+  }
+  
+  /* 🌟 Responsive Design */
+  @media (max-width: 768px) {
+    .modal-dialog {
+      max-width: 90%; /* Reduces modal width on small screens */
+    }
+  
+    .modal-title {
+      font-size: 18px;
+    }
+  
+    .office-code {
+      font-size: 16px;
+    }
+  
+    .modal-table th,
+    .modal-table td {
+      font-size: 14px;
+      padding: 8px;
+    }
+  
+    .modal-footer button {
+      font-size: 14px;
+      padding: 6px 15px;
+    }
+  }
+  
+/* Custom Modal */
+.manage-office-modal .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%; /* Makes it responsive */
+    max-width: 2000px; /* Ensures it doesn't exceed 2000px */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    margin: auto;
+}
+
+/* Clickable Office Name */
+.office-link {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* Action Icons */
+.action-icon {
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: color 0.2s;
+}
+.action-icon:hover {
+    color: red;
+}
+
+/* Table Adjustments */
+.modal-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.modal-table th,
+.modal-table td {
+    padding: 15px; /* Increased padding for uniform spacing */
+    text-align: left;
+    border: 1px solid #dee2e6;
+}
+
+.modal-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+/* Adjustments for Services & Personnel Columns */
+.modal-table td ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.modal-table td ul li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-table td ul li:last-child {
+    border-bottom: none;
+}
+
+/* Make Modal Responsive */
+@media (max-width: 768px) {
+    .modal-table th,
+    .modal-table td {
+        padding: 10px;
+    }
+
+    .manage-office-modal .modal-content {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .modal-table td ul li {
+        padding: 8px;
+    }
+}
+

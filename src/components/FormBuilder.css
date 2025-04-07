@@ -1,0 +1,478 @@
+
+
+/* Form Builder Container */
+.form-builder-container {
+    font-family: "Poppins", sans-serif;
+    max-width: 90%;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    padding: 25px;
+    /* margin: 50px auto;  */
+    align-items: center;
+    flex-direction: column;
+
+}
+
+/* Title Section */
+.title-container-border {
+    border: 2px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+.form-title-section input,
+.form-title-section textarea {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    border-radius: 6px;
+    border: 1px solid #dadce0;
+    font-size: 16px;
+}
+
+.form-title-section input:focus,
+.form-title-section textarea:focus {
+    outline: none;
+    border-color: #870d0d;
+    box-shadow: 0 0 5px rgba(135, 13, 13, 0.5);
+}
+
+/* Header */
+.form-builder-header {
+    font-size: 26px;
+    font-weight: 600;
+    color: #870d0d;
+    text-align: center;
+}
+
+/* Buttons */
+.form-button {
+    background-color: #870d0d;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 15px;
+    font-weight: 500;
+    margin: 5px 5px 10px 0;
+}
+
+.form-button:hover {
+    background-color: #870d0d;
+}
+
+.add-section-button {
+    background-color: #870d0d;
+}
+
+.add-section-button:hover {
+    background-color: #870d0d;
+}
+
+/* Container for action buttons */
+.action-buttons {
+    position: absolute;
+    top: 70px;
+    right: -50px;
+    display: flex;
+    gap: 10px;  /* Increase the gap between the buttons */
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Show buttons on hover */
+.form-question-card:hover .action-buttons {
+    opacity: 1;
+}
+
+/* Icon button styles */
+.action-buttons button {
+    background-color: #870d0d;
+    color: white;
+    border: none;
+    padding: 6px 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+}
+
+/* Delete button styling */
+.delete-icon {
+    background-color: #d93025;
+}
+
+.delete-icon:hover {
+    background-color: #a50e0e;
+}
+
+/* Add question button styling */
+.add-question-icon:hover {
+    background-color: #870d0d;
+}
+
+/* Form Elements */
+.form-input,
+.form-textarea,
+.form-select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.form-textarea:focus,
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: #870d0d;
+    box-shadow: 0 0 5px rgba(26, 115, 232, 0.5);
+}
+
+/* Card Styles */
+.form-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    margin-bottom: 15px;
+    position: relative;
+    border-left: 5px solid #870d0d;
+    transition: transform 0.2s;
+}
+
+.form-card:hover {
+    transform: scale(1.02);
+}
+
+/* Delete Icon */
+.delete-icon {
+    position: absolute;
+    top: 40px;
+    right: 6px;
+    cursor: pointer;
+    color: #870d0d;
+    transition: color 0.3s;
+    background: white;
+    border: none;
+    padding: 6px;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.delete-icon:hover {
+    color: #870d0d;
+}
+
+
+
+/* Options */
+.form-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.add-option-button {
+    background-color: #870d0d;
+    margin-top: 10px;
+}
+
+.add-option-button:hover {
+    background-color: #870d0d;
+}
+
+
+/* Add Question Button Styling */
+.add-question-icon {
+    position: absolute;
+    top: 69px;
+    right: 2px;
+    background-color: #870d0d;
+    color: white;  /* Ensure the plus icon is white */
+    border: none;
+    padding: 9px 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;  /* Adjust the size of the plus icon */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    display: flex;  /* Use flexbox to align the content */
+    justify-content: flex-end;  /* Align the content to the right */
+    align-items: center;  /* Center the image vertically */
+}
+
+/* Image inside the Add Question button */
+.add-question-img {
+    width: 20px;  /* Adjust the size as needed */
+    height: 20px; /* Ensure the image has a consistent height */
+    object-fit: contain;  /* Maintain the aspect ratio */
+    position: relative;
+}
+/* If you want to ensure the icon stays centered, you can add: */
+.add-question-icon span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* Show button on hover */
+.form-question-card:hover .add-question-icon {
+    opacity: 1;
+}
+/* Show button on hover */
+.form-question-card:hover .add-section-icon {
+    opacity: 1;
+}
+
+/* Add Section Icon */
+.add-section-icon {
+    background-color: #870d0d;
+    color: white;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s;
+}
+
+
+/* Toggle Required Button */
+.toggle-required-button {
+    background-color: #870d0d;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s;
+    margin-right: 8px;
+    position: absolute;
+    bottom: 36px;
+    right: -20px;
+
+}
+
+.toggle-required-button:hover {
+    background-color: #870d0d;
+}
+
+.toggle-required-button.active {
+    background-color: #870d0d;  /* Red for active (required) state */
+}
+
+.toggle-required-button.active:hover {
+    background-color: #870d0d;
+}
+
+
+
+
+/*Modallllllllllllllllllllllllllllllllllll*/
+
+/* New Preview Button */
+.preview-button {
+    background-color: #870d0d;
+}
+
+.preview-button:hover {
+    background-color: #870d0d;
+}
+
+
+/* Preview Modal */
+.preview-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Adjust preview-content to make it landscape-like (similar to bond paper) */
+.preview-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 1050px; /* Set a max width for better control */
+    height: 80%;
+    max-height: 800px;  /* Control the height to ensure it's not too tall */
+    overflow-y: auto;  /* Allow scrolling */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Section styling inside preview */
+.preview-section {
+    margin-bottom: 30px;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.preview-section h3 {
+    font-size: 22px;
+    margin-bottom: 5px;
+}
+
+.preview-section p {
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+/* Question styling in preview */
+.preview-question {
+    margin-top: 10px;
+    padding: 10px 0;
+}
+
+.preview-question p {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.preview-question input[type="checkbox"],
+.preview-question input[type="radio"] {
+    margin-right: 10px;
+}
+
+/* Styles for option inputs in preview */
+.preview-question .option {
+    margin-top: 8px;
+    font-size: 16px;
+}
+
+/* Scroll styling */
+.preview-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.preview-content::-webkit-scrollbar-thumb {
+    background-color: #870d0d;
+    border-radius: 10px;
+}
+
+.preview-content::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+/* Close Preview Button */
+.close-preview-button {
+    background-color: #870d0d;
+    color: white;
+    margin-top: 20px;
+}
+
+.close-preview-button:hover {
+    background-color: #870d0d;
+}
+
+/* Preview Navigation Buttons */
+.preview-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.preview-nav-button {
+    background-color: #870d0d;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+    font-size: 15px;
+    border: none;
+    transition: background-color 0.3s;
+}
+
+.preview-nav-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.preview-nav-button:hover:not(:disabled) {
+    background-color: #870d0d;
+}
+
+/* Dropdown Styles */
+.preview-question select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 10px;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.preview-question select option {
+    padding: 5px;
+}
+
+.preview-question textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+/* Increased specificity for select elements */
+.preview-modal .form-select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.preview-modal .form-select:focus {
+    outline: none;
+    border-color: #870d0d;
+    box-shadow: 0 0 5px rgba(26, 115, 232, 0.5);
+}
+
+
+/*NEW MODIF!!!!*/
+
+.form-card.form-element-card {
+    position: relative;
+  }
+  
+  .delete-icon1 {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 5px;
+    cursor: pointer;
+    display: none; /* Initially hidden */
+  }
+  
+  .form-card.form-element-card:hover .delete-icon1 {
+    display: block; /* Show when hovering over the card */
+  }

@@ -1,0 +1,164 @@
+/* AddOffice.css */
+
+/* Form container */
+.add-office-form {
+    max-width: 700px; /* Default for large screens */
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    position: relative;
+    left: 242px;
+}
+
+/* Form labels */
+.form-label {
+    font-weight: bold;
+}
+
+/* List group styling */
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    font-size: 16px;
+    background: #ffffff;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+/* Input field (Personnel & Service) */
+.input-small {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+}
+
+/* Add Button */
+.btn-add {
+    background-color: #870d0d;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 100px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.btn-add:hover {
+    background-color: #5a6268;
+}
+
+/* Icons inside list items */
+.icon-group {
+    display: flex;
+    align-items: center;
+}
+
+/* Edit Icon */
+.btn-edit {
+    cursor: pointer;
+    color: #007bff;
+    font-size: 18px;
+    transition: color 0.2s ease-in-out;
+    margin-right: 10px;
+}
+
+.btn-edit:hover {
+    color: #0056b3;
+}
+
+/* Delete (Trash Bin) Icon */
+.btn-remove {
+    cursor: pointer;
+    color: gray;
+    font-size: 18px;
+    transition: color 0.2s ease-in-out;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.btn-remove:hover {
+    color: red;
+}
+
+/* Submit Button */
+.btn-add-office {
+    background-color: rgb(135, 13, 13);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 150px;
+    font-weight: bold;
+}
+
+.btn-add-office:hover {
+    background-color: rgb(160, 20, 20);
+}
+
+/* -------------------------------- */
+/* RESPONSIVE ADJUSTMENTS */
+/* -------------------------------- */
+
+/* --- MOBILE (iPhone & Android) --- */
+@media (max-width: 480px) {
+    .add-office-form {
+        width: 90%;
+        left: 0; /* Remove left offset */
+        margin: 0 auto; /* Center align */
+        padding: 15px;
+    }
+
+    .btn-add, 
+    .btn-add-office {
+        width: 50%; /* Full width for smaller screens */
+    }
+
+    .list-group-item {
+        font-size: 14px; /* Reduce text size */
+        padding: 10px;
+    }
+
+    .btn-edit, .btn-remove {
+        font-size: 16px; /* Slightly smaller icons */
+    }
+}
+
+/* --- TABLET (iPad & Mid-size screens) --- */
+@media (min-width: 481px) and (max-width: 1024px) {
+    .add-office-form {
+        width: 85%;
+        left: 30px;
+        margin: 0 auto;
+    }
+
+    .btn-add, 
+    .btn-add-office {
+        width: 40%; /* Full width buttons */
+    }
+
+    .list-group-item {
+        font-size: 15px;
+    }
+
+    .btn-edit, .btn-remove {
+        font-size: 18px;
+    }
+}
+
+/* --- PC (Large Screens) --- */
+@media (min-width: 1025px) {
+    .add-office-form {
+        width: 70%;
+        left: 242px; /* Keep original offset */
+    }
+}

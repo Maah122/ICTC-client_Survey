@@ -1,0 +1,411 @@
+/* Base styles */
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+}
+
+.page-item {
+    padding: 5px;
+}
+
+.admin-container {
+    width: 100%;
+    height: 100vh;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px 20px 20px;
+    overflow: hidden;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.form-container input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+#searchBar{
+    font-size: 15px;
+    width: 40%;
+}
+#officeBar{
+    font-size: 13px;
+    width: 40%;
+    margin: 0;
+}
+#add-btn{
+    width: 10%;
+    font-size: 13px;
+}
+
+button {
+    padding: 8px 12px;
+    border: none;
+    background: #870d0d;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background: #680a0a;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background: #870d0d;
+    color: white;
+}
+
+.actions button {
+    margin-right: 5px;
+    background: #28a745;
+}
+
+.actions button:hover {
+    background: #218838;
+}
+
+.actions .delete-btn {
+    background: #dc3545;
+}
+
+.actions .delete-btn:hover {
+    background: #c82333;
+}
+
+.status-dropdown {
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.status-dropdown.active {
+    background-color: #28a745;
+    color: white;
+    border: 1px solid #218838;
+}
+
+.status-dropdown.inactive {
+    background-color: #dc3545;
+    color: white;
+    border: 1px solid #c82333;
+}
+
+.status-dropdown:hover {
+    opacity: 0.8;
+}
+
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .admin-container {
+        padding: 10px;
+    }
+    
+}
+
+@media (max-width: 900px) {
+    table {
+        font-size: 14px;
+    }
+    .form-container {
+        flex-direction: column;
+    }
+    .form-select{
+    margin: 0;
+    }
+    #category{
+    height: 40px;
+    gap: 5px;
+    }
+    #searchBar{
+    font-size: 13px;
+    width: 20px;
+    }
+    #officeBar{
+    font-size: 13px;
+    width: 40%;
+    padding-left: 8px;
+    }
+    #add-btn{
+    width: 40%;
+    font-size: 13px;
+    }
+    #edit-btn{
+    width: 40%;
+    height: 20%;
+    }
+    #delete-btn{
+    width: 55%;
+    height: 20%;
+    }
+    .container {
+    width: 100%;
+    height: 100vh;
+    max-width: 1200px;
+    overflow: hidden;
+    }
+}
+
+@media (max-width: 760px) {
+    .admin-container {
+        width: 95%;
+    }
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    .form-select{
+    margin: 0;
+    }
+    #category{
+    height: 40px;
+    gap: 5px;
+    }
+    #searchBar{
+    font-size: 13px;
+    width: 20px;
+    }
+    #officeBar{
+    font-size: 13px;
+    width: 40%;
+    padding-left: 8px;
+    }
+    #add-btn{
+    width: 40%;
+    font-size: 13px;
+    }
+    #edit-btn{
+    width: 40%;
+    height: 20%;
+    }
+    #delete-btn{
+    width: 55%;
+    height: 20%;
+    }
+    .container {
+    width: 100%;
+    height: 100vh;
+    max-width: 1200px;
+    overflow: hidden;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-container {
+        padding: 10px;
+    }
+    h2 {
+        font-size: 18px;
+    }
+    .form-select{
+    margin: 0;
+    }
+    #category{
+    height: 40px;
+    gap: 5px;
+    }
+    #searchBar{
+    font-size: 13px;
+    width: 20px;
+    }
+    #officeBar{
+    font-size: 13px;
+    width: 40%;
+    padding-left: 8px;
+    }
+    #add-btn{
+    width: 40%;
+    font-size: 13px;
+    }
+    #edit-btn{
+    width: 40%;
+    height: 20%;
+    }
+    #delete-btn{
+    width: 55%;
+    height: 20%;
+    }
+    .container {
+    width: 100%;
+    height: 100vh;
+    max-width: 1200px;
+    overflow: hidden;
+    }
+    th, td {
+        font-size: 12px;
+    }
+    .page-item {
+        padding: 3px;
+    }
+    
+}
+
+@media (max-width: 340px) {
+    body {
+        font-size: 14px;
+    }
+    button {
+        padding: 8px;
+    }
+    .form-container {
+        gap: 5px;
+    }
+    th, td {
+        padding: 5px;
+    }
+    .form-select{
+    margin: 0;
+    }
+    #category{
+    height: 40px;
+    gap: 5px;
+    }
+    #searchBar{
+    font-size: 13px;
+    width: 20px;
+    }
+    #officeBar{
+    font-size: 13px;
+    width: 40%;
+    padding-left: 8px;
+    }
+    #add-btn{
+    width: 40%;
+    font-size: 13px;
+    }
+    #edit-btn{
+    width: 40%;
+    height: 20%;
+    }
+    #delete-btn{
+    width: 55%;
+    height: 20%;
+    }
+    .container {
+    width: 100%;
+    height: 100vh;
+    max-width: 1200px;
+    overflow: hidden;
+    }
+}
+
+/*Add Survey Button*/
+#add-btn {
+    background-color: #dc3545; /* Red button */
+    color: white;
+    font-size: 14px;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 120px;
+}
+
+#add-btn:hover {
+    background-color: #c82333;
+}
+
+/* Styling for section dropdown and button in the same line */
+.d-flex.align-items-center {
+    display: flex;
+    align-items: center;
+}
+
+
+#edit-btn , #delete-btn{
+    margin-right: 10px; 
+}
+
+
+/* Toggle Switch */
+.switch {
+position: relative;
+display: inline-block;
+width: 50px;
+height: 25px;
+}
+
+.switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+
+.slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #dc3545; /* Red for Inactive */
+transition: 0.4s;
+border-radius: 25px;
+}
+
+.switch input:disabled + .slider {
+    background-color: #ccc; /* Change background color when disabled */
+    cursor: not-allowed; /* Change cursor to indicate it's not clickable */
+  }
+  
+  .switch input:disabled {
+    opacity: 0.5; /* Make the checkbox semi-transparent */
+  }
+
+.slider:before {
+position: absolute;
+content: "";
+height: 17px;
+width: 17px;
+left: 4px;
+bottom: 4px;
+background-color: white;
+transition: 0.4s;
+border-radius: 50%;
+}
+
+input:checked + .slider {
+background-color: #28a745; /* Green for Active */
+}
+
+input:checked + .slider:before {
+transform: translateX(24px);
+}
+
+/* Rounded slider */
+.slider.round {
+border-radius: 25px;
+}
+
+.slider.round:before {
+border-radius: 50%;
+}
