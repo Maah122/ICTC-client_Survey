@@ -61,8 +61,8 @@ const ManageOffice = () => {
   const filteredOffices = offices.filter(
     (office) =>
       office.office.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (office.officeCode &&
-        office.officeCode.toLowerCase().includes(searchTerm.toLowerCase()))
+      (office.office_code &&
+        office.office_code.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   // Pagination Logic
@@ -114,7 +114,7 @@ const ManageOffice = () => {
                   paginatedOffices.map((office) => (
                     <tr key={office.id}>
                       <td>{office.id}</td>
-                      <td>{office.officeCode || "N/A"}</td>
+                      <td>{office.office_code || "N/A"}</td>
                       <td className="text-dark">{office.office}</td>
                       <td>
                         <label className="switch">
