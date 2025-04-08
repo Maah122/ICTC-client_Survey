@@ -38,8 +38,15 @@ const ManageUser = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/users");
-        setUsers(response.data); // No additional mapping required now
+        const token = localStorage.getItem("token"); // assuming you're storing JWT here
+  
+        const response = await axios.get("http://localhost:5000/api/users", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        setUsers(response.data);
       } catch (error) {
         console.error("Error fetching users:", error);
       }
@@ -47,6 +54,7 @@ const ManageUser = () => {
   
     fetchUsers();
   }, []);
+  
   
   
   

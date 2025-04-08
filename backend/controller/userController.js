@@ -1,7 +1,6 @@
 // controllers/userController.js
 const jwt = require('jsonwebtoken');
 const { createUser, pool, findUserByUsername, updateUser, updateUserRights } = require("../model/userModel"); 
-const { getUsersByRole } = require("../model/userModel");
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'; // Use env in production
 
 const addUser = async (req, res) => {
@@ -24,30 +23,13 @@ const addUser = async (req, res) => {
 
 const getUsers = async (req, res) => {
   try {
-      const userId = req.user.id; // Get logged-in user's ID from JWT
-      const userRole = req.user.user_rights; // Get logged-in user's role
-      const userOffice = req.user.office; // Get logged-in user's office
+    const query = `SELECT id, office, name, email, user_rights AS rights FROM "CSS".users`;
+    const result = await pool.query(query);
 
-      let query;
-      let values = [];
-
-      if (userRole === 'Admin') {
-          // Admin can view all users
-          query = `SELECT id, office, name, email, user_rights AS rights FROM "CSS".users`;
-      } else if (userRole === 'Doctor' || userRole === 'Staff') {
-          // Doctor & Staff can only view users in their own office
-          query = `SELECT id, office, name, email, user_rights AS rights 
-                   FROM "CSS".users WHERE office = $1`;
-          values.push(userOffice);
-      } else {
-          return res.status(403).json({ error: "Forbidden: Access denied" });
-      }
-
-      const result = await pool.query(query, values);
-      res.status(200).json(result.rows);
+    res.status(200).json(result.rows);
   } catch (error) {
-      console.error("Error fetching users:", error);
-      res.status(500).json({ error: "Failed to fetch users" });
+    console.error("Error fetching users:", error);
+    res.status(500).json({ error: "Failed to fetch users" });
   }
 };
 

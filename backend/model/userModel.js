@@ -123,39 +123,6 @@ const updateUser = async (userId, userData) => {
   }
 };
 
-const getUsersByRole = async (userId) => {
-  try {
-      // Fetch the logged-in user's details
-      const userQuery = await pool.query(
-          `SELECT user_rights, office FROM "CSS".users WHERE id = $1`,
-          [userId]
-      );
-      const user = userQuery.rows[0];
-
-      if (!user) {
-          throw new Error("User not found");
-      }
-
-      let query, values;
-
-      if (user.user_rights === "View all") {
-          // If user has 'View all' rights, fetch all users
-          query = `SELECT * FROM "CSS".users`;
-          values = [];
-      } else {
-          // If 'Limited', fetch only users within the same office(s)
-          query = `SELECT * FROM "CSS".users WHERE office = ANY($1)`;
-          values = [user.office ? user.office.split(", ") : []];
-      }
-
-      const result = await pool.query(query, values);
-      return result.rows;
-  } catch (error) {
-      console.error("Error fetching users:", error);
-      throw error;
-  }
-};
-
 const updateUserRights = async (userId, user_rights, offices = []) => {
   const client = await pool.connect();
 
@@ -247,7 +214,5 @@ module.exports = {
   findUserByUsername,
   updateUser,
   updateUserRights,
-  getUsersByRole,
   pool,
 };
-

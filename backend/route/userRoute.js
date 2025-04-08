@@ -1,18 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const { addUser, getUsers, updateUserController, updateUserRightsController, deleteUser, login } = require("../controller/userController");
-const { authenticateToken, authorizeRole } = require("../middleware/auth");
 
-// Public Route (No Authentication Needed)
+router.post("/adduser", addUser);   
+router.get("/users", getUsers);
 router.post('/login', login);
-
-// Protected Routes (Require Authentication)
-router.use(authenticateToken); // Apply authentication middleware to all routes below
-
-router.get("/users", authorizeRole(["Admin", "Doctor", "Staff"]), getUsers); // Admin sees all, Doctor & Staff see only their office
-router.post("/adduser", authorizeRole(["Admin"]), addUser); // Only Admin can add users
-router.put("/update-user/:id", authorizeRole(["Admin"]), updateUserController); // Only Admin can update users
-router.put("/update-user-rights/:id", authorizeRole(["Admin"]), updateUserRightsController); // Only Admin can update user rights
-router.delete("/deleteuser/:id", authorizeRole(["Admin"]), deleteUser); // Only Admin can delete users
+router.put("/update-user/:id", updateUserController);   // Update user route
+router.put("/update-user-rights/:id", updateUserRightsController);
+router.delete("/deleteuser/:id", deleteUser); // Delete user route
 
 module.exports = router;

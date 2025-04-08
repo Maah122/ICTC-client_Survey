@@ -13,14 +13,4 @@ const authenticateToken = (req, res, next) => {
     }
 };
 
-// Middleware: Restrict Access Based on User Role
-const authorizeRole = (allowedRoles) => {
-    return (req, res, next) => {
-        if (!allowedRoles.includes(req.user.user_rights)) {
-            return res.status(403).json({ error: "Forbidden: Access Denied" });
-        }
-        next();
-    };
-};
-
-module.exports = { authenticateToken, authorizeRole };
+module.exports = authenticateToken;
