@@ -63,14 +63,14 @@ const AdminSidebar = () => {
           )}
 
           {/* Admin Only: Manage Offices */}
-          {isAdmin && (
+          
                   <li>
                   <a href="/manageoffice" className="nav-link" title="Manage Office">
                     <i className="bi bi-building-fill"></i>
                     <span className="link-text"> Offices</span>
                   </a>
                 </li>
-          )}
+          
 
           {/* Admin Only: Manage Users */}
           {isAdmin && (

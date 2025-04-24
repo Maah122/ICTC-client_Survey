@@ -74,7 +74,7 @@ function App() {
           </ProtectedRoute>
         } />
         <Route path="/manageoffice" element={
-          <ProtectedRoute allowedRoles={["Admin"]}>
+          <ProtectedRoute allowedRoles={["Admin", "View all", "Limited"]}>
             <ManageOffice />
           </ProtectedRoute>
         } />
@@ -84,7 +84,7 @@ function App() {
           </ProtectedRoute>
         } />
         <Route path="/edit-office" element={
-          <ProtectedRoute allowedRoles={["Admin"]}>
+          <ProtectedRoute allowedRoles={["Admin", "View all", "Limited"]}>
             <EditOffice />
           </ProtectedRoute>
         } />

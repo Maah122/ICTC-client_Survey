@@ -1,5 +1,7 @@
     import React, { useState, useEffect } from "react";
     import { useNavigate, useLocation } from "react-router-dom";
+    import { jwtDecode } from "jwt-decode";
+    import { getUserFromToken } from "../utils/auth";
     import Navbar from "../global/NavBar";
     import AdminSidebar from "../global/AdminSideBar";
     import "bootstrap/dist/css/bootstrap.min.css";
@@ -35,11 +37,37 @@
       const [isFieldInvalid, setIsFieldInvalid] = useState(false);
       const [isFieldInvalid2, setIsFieldInvalid2] = useState(false);
 
+
+         // Get token from localStorage and decode it
+         const token = localStorage.getItem("token");
+         let userRights = "";
+         let allowedOfficeCodes = [];
+         const user = getUserFromToken(); // Make sure this is imported properly
+       
+         if (user) {
+           userRights = user.user_rights;
+       
+           // Handle multiple office codes (split by comma and trim spaces)
+           if (user.office) {
+             allowedOfficeCodes = user.office.split(",").map(code => code.trim());
+           }
+         }
+        
+          const isAdmin = userRights === "Admin"; // Capital A
+          const isViewAll = userRights === "View all";
+          const isLimited = userRights === "Limited";
+
       useEffect(() => {
         if (!office) {
           navigate("/manageoffice");
         }
       }, [office, navigate]);
+
+      useEffect(() => {
+        console.log("Office data:", office);
+        console.log("Services:", services);
+        console.log("Personnel:", personnel);
+      }, [office, services, personnel]);
 
       const startEditing = (type, index, value) => {
         setEditType(type);
@@ -246,7 +274,7 @@
               {error && <div className="alert alert-danger">{error}</div>}
               <form onSubmit={handleSubmit} className="add-office-form">
                 <h4>Edit Office</h4>
-
+      
                 {/* Office Code */}
                 <div className="mb-3">
                   <label className="form-label">Office Code</label>
@@ -256,9 +284,10 @@
                     value={office_code}
                     onChange={(e) => setOfficeCode(e.target.value)}
                     required
+                    disabled={isViewAll}
                   />
                 </div>
-
+      
                 {/* Office Name */}
                 <div className="mb-3">
                   <label className="form-label">Office Name</label>
@@ -268,9 +297,10 @@
                     value={officeName}
                     onChange={(e) => setOfficeName(e.target.value)}
                     required
+                    disabled={isViewAll}
                   />
                 </div>
-
+      
                 {/* Services Section */}
                 <div className="mb-3">
                   <div className="d-flex justify-content-between align-items-center">
@@ -283,29 +313,32 @@
                       {showServices ? "▼ Hide" : "▶ Show"}
                     </button>
                   </div>
-
-                  <br></br> 
+      
+                  <br />
                   {showServices && (
                     <>
-                      <div className="d-flex">
-                        <input
-                          type="text"
-                          className={`form-control me-2 ${isFieldInvalid2 ? 'is-invalid' : ''}`}
-                          placeholder="Enter service"
-                          value={newService}
-                          onChange={(e) => setNewService(e.target.value)}
-                          disabled={loading}
-                        />
-                        <button 
-                          type="button" 
-                          className="btn btn-add" 
-                          onClick={handleAddService}
-                          disabled={loading}
-                        >
-                          {loading ? "Adding..." : "Add"}
-                        </button>
-                      </div>
-
+                      {/* Only show the add service input if not in view mode */}
+                      {!isViewAll && (
+                        <div className="d-flex">
+                          <input
+                            type="text"
+                            className={`form-control me-2 ${isFieldInvalid2 ? 'is-invalid' : ''}`}
+                            placeholder="Enter service"
+                            value={newService}
+                            onChange={(e) => setNewService(e.target.value)}
+                            disabled={loading}
+                          />
+                          <button 
+                            type="button" 
+                            className="btn btn-add" 
+                            onClick={handleAddService}
+                            disabled={loading}
+                          >
+                            {loading ? "Adding..." : "Add"}
+                          </button>
+                        </div>
+                      )}
+      
                       <ul className="list-group mt-2">
                         {paginate(services, servicePage).map((service, index) => {
                           const globalIndex = (servicePage - 1) * ITEMS_PER_PAGE + index;
@@ -343,20 +376,19 @@
                                   <div className="d-flex align-items-center ms-2">
                                     <i
                                       className="bi bi-pencil-square text-dark me-2"
-                                      style={{ cursor: "pointer" }}
+                                      style={{ cursor: "pointer", display: isViewAll ? 'none' : 'block' }} // Hide edit icon in view mode
                                       onClick={() => startEditing("service", globalIndex, service.name)}
                                     />
+                                    { !isViewAll && (
                                     <label className="switch">
                                       <input
                                         type="checkbox"
                                         checked={service.status === "Active"}
-                                        onChange={() => handleStatusChange(
-                                          service.id, 
-                                          service.status === "Active" ? "Inactive" : "Active"
-                                        )}
+                                        onChange={() => handleStatusChange (service.id, service.status === "Active" ? "Inactive" : "Active")}
                                       />
                                       <span className="slider round"></span>
                                     </label>
+                                    )}
                                   </div>
                                 </>
                               )}
@@ -364,7 +396,7 @@
                           );
                         })}
                       </ul>
-
+      
                       <div>
                         {Array.isArray(services) && totalPages(services) > 1 && (
                           <nav>
@@ -382,7 +414,7 @@
                                   </button>
                                 </li>
                               )}
-
+      
                               <li className={`page-item ${servicePage === 1 ? "active" : ""}`}>
                                 <button 
                                   className="page-link" 
@@ -394,7 +426,7 @@
                                   1
                                 </button>
                               </li>
-
+      
                               {servicePage > 4 && <li className="page-item disabled"><span className="page-link">...</span></li>}
                               {Array.isArray(services) &&
                                 Array.from({ length: 4 }, (_, i) => servicePage - 1 + i)
@@ -413,7 +445,7 @@
                                     </li>
                                   ))}
                               {servicePage < totalPages(services) - 4 && <li className="page-item disabled"><span className="page-link">...</span></li>}
-
+      
                               {totalPages(services) > 1 && (
                                 <li className={`page-item ${servicePage === totalPages(services) ? "active" : ""}`}>
                                   <button 
@@ -427,7 +459,7 @@
                                   </button>
                                 </li>
                               )}
-
+      
                               {servicePage < totalPages(services) && (
                                 <li className="page-item">
                                   <button 
@@ -445,10 +477,10 @@
                           </nav>
                         )}
                       </div>
-                    </>     
-                  )}    
+                    </>
+                  )}
                 </div>
-
+      
                 {/* Personnel Section */}
                 <div className="mb-3">
                   <div className="d-flex justify-content-between align-items-center">
@@ -461,28 +493,31 @@
                       {showPersonnel ? "▼ Hide" : "▶ Show"}
                     </button>
                   </div>
-                  <br></br>
+                  <br />
                   {showPersonnel && (
                     <>
-                      <div className="d-flex">
-                        <input
-                          type="text"
-                          className={`form-control me-2 ${isFieldInvalid ? 'is-invalid' : ''}`}
-                          placeholder="Enter personnel name"
-                          value={newPersonnel}
-                          onChange={(e) => setNewPersonnel(e.target.value)} 
-                          disabled={loading}
-                        />
-                        <button 
-                          type="button" 
-                          className="btn btn-add" 
-                          onClick={handleAddPersonnel}
-                          disabled={loading}
-                        >
-                          {loading ? "Adding..." : "Add"}
-                        </button>
-                      </div>
-
+                      {/* Only show the add personnel input if not in view mode */}
+                      {!isViewAll && (
+                        <div className="d-flex">
+                          <input
+                            type="text"
+                            className={`form-control me-2 ${isFieldInvalid ? 'is-invalid' : ''}`}
+                            placeholder="Enter personnel name"
+                            value={newPersonnel}
+                            onChange={(e) => setNewPersonnel(e.target.value)} 
+                            disabled={loading}
+                          />
+                          <button 
+                            type="button" 
+                            className="btn btn-add" 
+                            onClick={handleAddPersonnel}
+                            disabled={loading}
+                          >
+                            {loading ? "Adding..." : "Add"}
+                          </button>
+                        </div>
+                      )}
+      
                       <ul className="list-group mt-2">
                         {paginate(personnel, personnelPage).map((p, index) => {
                           const globalIndex = (personnelPage - 1) * ITEMS_PER_PAGE + index;
@@ -499,7 +534,7 @@
                                   />
                                   <button 
                                     className="btn btn-sm ms-2" 
-                                    style={{ backgroundColor: "#870d0d", color: "white" }} 
+                                    style={{ backgroundColor: "#870 d0d", color: "white" }} 
                                     onClick={saveEdit}
                                     disabled={loading}
                                   >
@@ -520,9 +555,10 @@
                                   <div className="d-flex align-items-center ms-2">
                                     <i
                                       className="bi bi-pencil-square text-dark me-2"
-                                      style={{ cursor: "pointer" }}
+                                      style={{ cursor: "pointer", display: isViewAll ? 'none' : 'block' }} // Hide edit icon in view mode
                                       onClick={() => startEditing("personnel", globalIndex, p.name)}
                                     />
+                                    { !isViewAll && (
                                     <label className="switch">
                                       <input
                                         type="checkbox"
@@ -534,6 +570,8 @@
                                       />
                                       <span className="slider round"></span>
                                     </label>
+                                    
+                                      )}
                                   </div>
                                 </>
                               )}
@@ -541,7 +579,7 @@
                           );
                         })}
                       </ul>
-
+      
                       <div>
                         {Array.isArray(personnel) && totalPages(personnel) > 1 && (
                           <nav>
@@ -559,7 +597,7 @@
                                   </button>
                                 </li>
                               )}
-
+      
                               <li className={`page-item ${personnelPage === 1 ? "active" : ""}`}>
                                 <button 
                                   className="page-link" 
@@ -571,7 +609,7 @@
                                   1
                                 </button>
                               </li>
-
+      
                               {personnelPage > 4 && <li className="page-item disabled"><span className="page-link">...</span></li>}
                               {Array.isArray(personnel) &&
                                 Array.from({ length: 4 }, (_, i) => personnelPage - 1 + i)
@@ -590,7 +628,7 @@
                                     </li>
                                   ))}
                               {personnelPage < totalPages(personnel) - 4 && <li className="page-item disabled"><span className="page-link">...</span></li>}
-
+      
                               {totalPages(personnel) > 1 && (
                                 <li className={`page-item ${personnelPage === totalPages(personnel) ? "active" : ""}`}>
                                   <button 
@@ -604,7 +642,7 @@
                                   </button>
                                 </li>
                               )}
-
+      
                               {personnelPage < totalPages(personnel) && (
                                 <li className="page-item">
                                   <button 
@@ -625,11 +663,11 @@
                     </>
                   )}
                 </div>
-
+      
                 <button 
                   type="submit" 
                   className="btn btn-add-office"
-                  disabled={loading}
+                  disabled={loading || isViewAll} // Disable save button in view mode
                 >
                   {loading ? "Saving Changes..." : "Save Changes"}
                 </button>
@@ -646,6 +684,6 @@
           </div>
         </div>
       );
-    };
-
-    export default EditOffice;
+      };
+      
+      export default EditOffice;
