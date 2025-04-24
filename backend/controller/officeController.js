@@ -112,36 +112,36 @@ const officeController = {
     },
 
     addService: async (req, res) => {
-        const { officeId } = req.params;
-        const { serviceName } = req.body;
-
         try {
+            const { officeId } = req.params; // ✅ Correct destructuring
+            const { serviceName } = req.body;
+        
             if (!serviceName) {
-                return res.status(400).json({ message: "Service name is required" });
+                return res.status(400).json({ message: "Service name is required." });
             }
-
+        
             const newService = await Office.addService(officeId, serviceName);
-            res.status(201).json({ message: "Service added successfully", service: newService });
+            res.status(201).json(newService);
         } catch (error) {
-            console.error("❌ Error adding service:", error);
-            res.status(500).json({ message: "Error adding service" });
+            console.error("Add service error:", error);
+            res.status(500).json({ message: "Server error" });
         }
     },
-
+    
     addPersonnel: async (req, res) => {
-        const { officeId } = req.params;
-        const { personnelName } = req.body;
-
         try {
+            const { officeId } = req.params; // ✅ Correct destructuring
+            const { personnelName } = req.body;
+        
             if (!personnelName) {
-                return res.status(400).json({ message: "Personnel name is required" });
+                return res.status(400).json({ message: "Personnel name is required." });
             }
-
+        
             const newPersonnel = await Office.addPersonnel(officeId, personnelName);
-            res.status(201).json({ message: "Personnel added successfully", personnel: newPersonnel });
+            res.status(201).json(newPersonnel);
         } catch (error) {
-            console.error("❌ Error adding personnel:", error);
-            res.status(500).json({ message: "Error adding personnel" });
+            console.error("Add personnel error:", error);
+            res.status(500).json({ message: "Server error" });
         }
     },
 
@@ -233,6 +233,8 @@ const officeController = {
             res.status(500).json({ message: "Error updating personnel" });
         }
     },
+
+        
     
     
 };
