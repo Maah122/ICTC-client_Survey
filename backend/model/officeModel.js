@@ -77,52 +77,95 @@ const Info = {
     updateOffice: async (officeId, office_code, name, services, personnel) => {
         const client = await pool.connect();
         try {
-            await client.query("BEGIN");
-    
-            // ✅ Update office details
+          await client.query("BEGIN");
+      
+          await client.query(
+            'UPDATE "CSS".office SET office_code = $1, name = $2 WHERE id = $3',
+            [office_code, name, officeId]
+          );
+      
+          // Get existing service and personnel IDs
+          const existingServicesResult = await client.query(
+            'SELECT id FROM "CSS".service WHERE office_id = $1',
+            [officeId]
+          );
+          const existingPersonnelResult = await client.query(
+            'SELECT id FROM "CSS".personnel WHERE office_id = $1',
+            [officeId]
+          );
+      
+          const existingServiceIds = existingServicesResult.rows.map(row => row.id);
+          const existingPersonnelIds = existingPersonnelResult.rows.map(row => row.id);
+      
+          // Delete removed services
+          const newServiceIds = services.filter(s => s.id).map(s => s.id);
+          const serviceIdsToDelete = existingServiceIds.filter(id => !newServiceIds.includes(id));
+          if (serviceIdsToDelete.length > 0) {
             await client.query(
-                'UPDATE "CSS".office SET office_code = $1, name = $2 WHERE id = $3',
-                [office_code, name, officeId]
+              `DELETE FROM "CSS".service WHERE id = ANY($1::int[]) AND office_id = $2`,
+              [serviceIdsToDelete, officeId]
             );
-    
-            // ✅ Remove old services and add new ones
-            await client.query('DELETE FROM "CSS".service WHERE office_id = $1', [officeId]);
-            const insertedServices = [];
-            for (const service of services || []) {
-                const serviceResult = await client.query(
-                    'INSERT INTO "CSS".service (office_id, name) VALUES ($1, $2) RETURNING *',
-                    [officeId, service]
-                );
-                insertedServices.push(serviceResult.rows[0]);
+          }
+      
+          // Upsert services
+          for (const s of services || []) {
+            if (s.id && existingServiceIds.includes(s.id)) {
+              await client.query(
+                'UPDATE "CSS".service SET name = $1, status = $2 WHERE id = $3 AND office_id = $4',
+                [s.name, s.status, s.id, officeId]
+              );
+            } else {
+              await client.query(
+                'INSERT INTO "CSS".service (office_id, name, status) VALUES ($1, $2, $3)',
+                [officeId, s.name, s.status]
+              );
             }
-    
-            // ✅ Remove old personnel and add new ones
-            await client.query('DELETE FROM "CSS".personnel WHERE office_id = $1', [officeId]);
-            const insertedPersonnel = [];
-            for (const person of personnel || []) {
-                const personnelResult = await client.query(
-                    'INSERT INTO "CSS".personnel (office_id, name) VALUES ($1, $2) RETURNING *',
-                    [officeId, person]
-                );
-                insertedPersonnel.push(personnelResult.rows[0]);
+          }
+      
+          // Delete removed personnel
+          const newPersonnelIds = personnel.filter(p => p.id).map(p => p.id);
+          const personnelIdsToDelete = existingPersonnelIds.filter(id => !newPersonnelIds.includes(id));
+          if (personnelIdsToDelete.length > 0) {
+            await client.query(
+              `DELETE FROM "CSS".personnel WHERE id = ANY($1::int[]) AND office_id = $2`,
+              [personnelIdsToDelete, officeId]
+            );
+          }
+      
+          // Upsert personnel
+          for (const p of personnel || []) {
+            if (p.id && existingPersonnelIds.includes(p.id)) {
+              await client.query(
+                'UPDATE "CSS".personnel SET name = $1, status = $2 WHERE id = $3 AND office_id = $4',
+                [p.name, p.status, p.id, officeId]
+              );
+            } else {
+              await client.query(
+                'INSERT INTO "CSS".personnel (office_id, name, status) VALUES ($1, $2, $3)',
+                [officeId, p.name, p.status]
+              );
             }
-    
-            await client.query("COMMIT");
-            return {
-                id: officeId,
-                office_code,
-                name,
-                services: insertedServices,
-                personnel: insertedPersonnel
-            };
+          }
+      
+          await client.query("COMMIT");
+      
+          return {
+            id: officeId,
+            office_code,
+            name,
+            services,
+            personnel
+          };
         } catch (error) {
-            await client.query("ROLLBACK");
-            console.error("❌ Database Error:", error.stack);
-            throw new Error(`Database update failed: ${error.message}`);
+          await client.query("ROLLBACK");
+          console.error("❌ Database Error:", error.stack);
+          throw new Error(`Database update failed: ${error.message}`);
         } finally {
-            client.release();
+          client.release();
         }
-    },
+      },
+      
+      
     
 
     // Add Services
@@ -155,6 +198,40 @@ const Info = {
         );
         return result.rows[0]; // Return the updated personnel
     },
-};
+
+    updateOfficeStatus: async (officeId, status) => {
+        const result = await pool.query(
+            'UPDATE "CSS".office SET status = $1 WHERE id = $2 RETURNING *',
+            [status, officeId]
+        );
+        return result.rows[0];
+    },
+
+    updateOfficeStatus: async (officeId, status) => {
+        const result = await pool.query(
+            'UPDATE "CSS".office SET status = $1 WHERE id = $2 RETURNING *',
+            [status, officeId]
+        );
+        return result.rows[0];
+    },
+    
+        // Add these methods to your Office model
+    updateServiceStatus: async (officeId, serviceId, status) => {
+        const result = await pool.query(
+            'UPDATE "CSS".service SET status = $1 WHERE office_id = $2 AND id = $3 RETURNING *',
+            [status, officeId, serviceId]
+        );
+        return result.rows[0];
+    },
+
+    updatePersonnelStatus: async (officeId, personnelId, status) => {
+        const result = await pool.query(
+            'UPDATE "CSS".personnel SET status = $1 WHERE office_id = $2 AND id = $3 RETURNING *',
+            [status, officeId, personnelId]
+        );
+        return result.rows[0];
+    },
+
+    };
 
 module.exports = Info;

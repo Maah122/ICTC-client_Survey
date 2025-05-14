@@ -1,4 +1,3 @@
-
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "../App.css";
 import React, {useEffect, useState} from 'react';
@@ -12,8 +11,8 @@ const description = [
     "In view of this, we would like to know and gather your thoughts on how a particular office has served your needs and met your satisfaction in terms of the services you have availed by taking time in answering this survey. Your objective and honest answer in this survey will be highly appreciated.",
     "This Client Satisfaction Measurement (CSM) tracks the customer experience of government offices. Your feedback on your recently concluded transaction will help this office provide a better service. Personal information shared will be kept confidential and you always have the option to not answer this form.",
     "Let us journey together to a greater MSU-IIT!"
-  ];
-  
+];
+
 const LandingPage = () => {
     const navigate = useNavigate();
     const [selectedOffice, setSelectedOffice] = useState("");
@@ -22,36 +21,41 @@ const LandingPage = () => {
     //fetch offices from backend
     useEffect(() => {
         const fetchOffices = async () => {
-          try {
-            const response = await fetch("http://localhost:5000/api/offices");
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
+            try {
+                const response = await fetch("http://localhost:5000/api/offices");
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log("Fetched offices:", data); // Debugging
+                
+                // Filter active offices and sort alphabetically by name
+                const activeOffices = data
+                    .filter(office => office.status === true)
+                    .sort((a, b) => a.name.localeCompare(b.name));
+                
+                setOffices(activeOffices);
+            } catch (error) {
+                console.error("Error fetching offices:", error);
             }
-            const data = await response.json();
-            console.log("Fetched offices:", data); // Debugging
-            setOffices(data);
-          } catch (error) {
-            console.error("Error fetching offices:", error);
-          }
         };
-      
-        fetchOffices();
-      }, []);
-      
 
-      const handleNext = async () => {
+        fetchOffices();
+    }, []);
+
+    const handleNext = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/surveys"); // Fetch all surveys
+            const response = await axios.get("http://localhost:5000/api/surveys");
             const surveys = response.data;
-    
+
             // Find the first survey where status is true
             const activeSurvey = surveys.find(survey => survey.status === true);
-    
+
             if (!activeSurvey) {
                 alert("No active surveys available.");
                 return;
             }
-    
+
             if (selectedOffice) {
                 navigate(`/office/${selectedOffice}/survey/${activeSurvey.id}`);
             } else {
@@ -62,35 +66,39 @@ const LandingPage = () => {
             alert("Failed to check survey status.");
         }
     };
-    
-    
+
     return (
         <div>
             <Navbar/>
             <div className="survey-container">
-            {/* Header Banner */}
-            <div className="banner">
-                <img src={banner} alt="Client Satisfaction Measurement" className="banner-img" />
-            </div>
-
-            {/* Survey Description */}
-            <div className="survey-content">
-                {description.map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
-                ))}
-
-                {/* Survey Dropdown */}
-                <h3>Client Satisfactory Survey</h3>
-                <div className="survey-dropdown">
-                <select value={selectedOffice} onChange={(e) => setSelectedOffice(e.target.value)}>
-                <option value="">-- Choose --</option>
-                {offices.map((office) => (
-                    <option key={office.id} value={office.id}>{office.name}</option>
-                ))}
-            </select>
+                {/* Header Banner */}
+                <div className="banner">
+                    <img src={banner} alt="Client Satisfaction Measurement" className="banner-img" />
                 </div>
-                <button className="next-btn"  onClick={handleNext}> Next </button>
-            </div>
+
+                {/* Survey Description */}
+                <div className="survey-content">
+                    {description.map((paragraph, index) => (
+                        <p key={index}>{paragraph}</p>
+                    ))}
+
+                    {/* Survey Dropdown */}
+                    <h3>Client Satisfactory Survey</h3>
+                    <div className="survey-dropdown">
+                        <select 
+                            value={selectedOffice} 
+                            onChange={(e) => setSelectedOffice(e.target.value)}
+                        >
+                            <option value="">-- Choose --</option>
+                            {offices.map((office) => (
+                                <option key={office.id} value={office.id}>
+                                    {office.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <button className="next-btn" onClick={handleNext}> Next </button>
+                </div>
             </div>
         </div>
     );

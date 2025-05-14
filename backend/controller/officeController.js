@@ -234,6 +234,98 @@ const officeController = {
         }
     },
 
+    updateOfficeStatus: async (req, res) => {
+        const { officeId } = req.params;
+        const { status } = req.body;
+
+        try {
+
+            const updatedOffice = await Office.updateOfficeStatus(officeId, status);
+            
+            if (!updatedOffice) {
+                return res.status(404).json({ error: "Office not found" });
+            }
+
+            res.json({
+                success: true,
+                message: "Office status updated successfully",
+                office: updatedOffice
+            });
+        } catch (error) {
+            console.error("Error updating office status:", error);
+            res.status(500).json({ 
+                success: false,
+                error: "Error updating office status" 
+            });
+        }
+    },
+
+    // Get active office
+    getActiveOffice: async (req, res) => {
+        try {
+            const activeOffice = await Office.getActiveOffice();
+            res.json({
+                success: true,
+                office: activeOffice || null
+            });
+        } catch (error) {
+            console.error("Error getting active office:", error);
+            res.status(500).json({ 
+                success: false,
+                error: "Error getting active office" 
+            });
+        }
+    },
+
+    // Add these controller methods
+updateServiceStatus: async (req, res) => {
+    const { officeId, serviceId } = req.params;
+    const { status } = req.body;
+
+    try {
+        const updatedService = await Office.updateServiceStatus(officeId, serviceId, status);
+        if (!updatedService) {
+            return res.status(404).json({ message: "Service not found" });
+        }
+
+        res.json({ 
+            success: true,
+            message: "Service status updated successfully",
+            service: updatedService
+        });
+    } catch (error) {
+        console.error("Error updating service status:", error);
+        res.status(500).json({ 
+            success: false,
+            error: "Error updating service status" 
+        });
+    }
+},
+
+updatePersonnelStatus: async (req, res) => {
+    const { officeId, personnelId } = req.params;
+    const { status } = req.body;
+
+    try {
+        const updatedPersonnel = await Office.updatePersonnelStatus(officeId, personnelId, status);
+        if (!updatedPersonnel) {
+            return res.status(404).json({ message: "Personnel not found" });
+        }
+
+        res.json({ 
+            success: true,
+            message: "Personnel status updated successfully",
+            personnel: updatedPersonnel
+        });
+    } catch (error) {
+        console.error("Error updating personnel status:", error);
+        res.status(500).json({ 
+            success: false,
+            error: "Error updating personnel status" 
+        });
+    }
+},
+
         
     
     

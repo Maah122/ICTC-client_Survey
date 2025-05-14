@@ -39,7 +39,7 @@ const ManageOffice = () => {
   const fetchOffices = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/offices");
-      console.log("Fetched offices:", response.data); // Debugging line
+      console.log("Fetched offices:", response.data);  // Check if updated status is present
       setOffices(response.data);
     } catch (error) {
       console.error("Error fetching offices:", error);
@@ -55,13 +55,22 @@ const ManageOffice = () => {
   }, []);
 
   // Handle toggling the active status of an office
-  const handleToggleStatus = (id, isActive) => {
-    const updatedOffices = offices.map((office) =>
-      office.id === id ? { ...office, isActive: !isActive } : office
-    );
-    setOffices(updatedOffices);
+  const handleToggleStatus = async (id, currentStatus) => {
+    try {
+      const newStatus = !currentStatus;
+      const response = await axios.put(`http://localhost:5000/api/offices/${id}/status`, {
+        status: newStatus,
+      });
+  
+      if (response.data.success) {
+        // Refresh the office data immediately after successful update
+        fetchOffices();
+      }
+    } catch (error) {
+      console.error("Error updating office status:", error);
+    }
   };
-
+  
   const deleteOffice = async (id) => {
     if (window.confirm("Are you sure you want to delete this office?")) {
       try {
@@ -140,13 +149,12 @@ const ManageOffice = () => {
                       {isAdmin && (
                         <td>
                           <label className="switch">
-                            <input
-                              type="checkbox"
-                              checked={office.isActive ?? true} // Default to active if not set
-                              onChange={() =>
-                                handleToggleStatus(office.id, office.isActive)
-                              }
-                            />
+                          <input
+                            type="checkbox"
+                            checked={office.status}
+                            onChange={() => handleToggleStatus(office.id, office.status)}
+                          />
+
                             <span className="slider round"></span>
                           </label>
                         </td>

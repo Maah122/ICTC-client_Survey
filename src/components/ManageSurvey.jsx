@@ -6,7 +6,7 @@ import axios from "axios"; // Import axios for API calls
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./ManageSurvey.css";
 
-const ManageUser  = () => {
+const ManageSurvey  = () => {
   const [surveys, setSurveys] = useState([]); // Change from users to surveys
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -216,4 +216,4 @@ const deleteSurvey = async (surveyId) => {
   );
 };
 
-export default ManageUser ;
+export default ManageSurvey ;
