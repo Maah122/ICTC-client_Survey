@@ -27,7 +27,7 @@ const EditUser = () => {
   const fetchOffices = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/offices");
-      console.log("Fetched offices:", response.data); // ← Add this line
+      console.log("Fetched offices:", response.data);
       setOfficeOptions(response.data);
     } catch (err) {
       console.error("Error loading offices:", err);
@@ -35,9 +35,9 @@ const EditUser = () => {
   };
 
   useEffect(() => {
-    fetchOffices(); // Call the fetch function for offices
+    fetchOffices();
   }, []);
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditedUser({ ...editedUser, [name]: value });
@@ -46,7 +46,7 @@ const EditUser = () => {
   const handleUserRightsChange = (e) => {
     const value = e.target.value;
     setUserRights(value);
-    if (value === "Limited") setShowModal(true);
+    if (value === "Limited" || value === "View all") setShowModal(true);
   };
 
   const addOffice = () => {
@@ -56,7 +56,6 @@ const EditUser = () => {
       setSelectedOffice("");
     }
   };
-  
 
   const removeOffice = (office) => {
     setSelectedOffices(selectedOffices.filter((o) => o !== office));
@@ -70,17 +69,18 @@ const EditUser = () => {
         password: editedUser.password,
         user_rights: userRights,
       };
-      
-      if (userRights === "Limited") {
+
+      if (userRights === "Limited" || userRights === "View all") {
         updatedUser.offices = selectedOffices.map(o => o.id);
-      }    
+      }
+
       console.log("Updating user with ID:", editedUser.id);
-  
+
       const response = await axios.put(
         `http://localhost:5000/api/update-user/${editedUser.id}`,
         updatedUser
       );
-  
+
       console.log("User Updated:", response.data);
       alert("User updated successfully!");
       navigate("/manageuser");
@@ -89,11 +89,10 @@ const EditUser = () => {
       alert("Failed to update user. Please try again.");
     }
   };
-  
 
   const saveUserRights = () => {
-    setShowModal(false); // We just close the modal here
-  };  
+    setShowModal(false);
+  };
 
   return (
     <div>
@@ -154,7 +153,7 @@ const EditUser = () => {
                       <input type="radio" name="userRights" value="Limited" checked={userRights === "Limited"} onChange={handleUserRightsChange} /> Limited
                     </label>
                   </div>
-                  {userRights === "Limited" && (
+                  {(userRights === "Limited" || userRights === "View all") && (
                     <div className="mt-3">
                       <label>Selected Offices:</label>
                       <i id="add-office-btn" className="bi bi-plus-circle" style={{ cursor: 'pointer'}} onClick={() => setShowModal(true)}> Add</i>
@@ -168,7 +167,7 @@ const EditUser = () => {
                       </ul>
                     </div>
                   )}
-                </div> 
+                </div>
 
                 <button onClick={saveUser} className="btn btn-success mt-4 w-100">
                   Save Changes

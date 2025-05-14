@@ -34,13 +34,13 @@ const OfficeSurvey = () => {
     const [selectedAnswers, setSelectedAnswers] = useState([]);
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
     const [responseId, setResponseId] = useState(null);
-    const [validationErrors, setValidationErrors] = useState({}); // Track validation errors
-    const [isValidationModalOpen, setIsValidationModalOpen] = useState(false); // Validation modal state
-    const [validationMessage, setValidationMessage] = useState(""); // Validation message
+    const [validationErrors, setValidationErrors] = useState({});
+    const [isValidationModalOpen, setIsValidationModalOpen] = useState(false);
+    const [validationMessage, setValidationMessage] = useState("");
     const [survey, setSurvey] = useState(null);
     const [error, setError] = useState(null);
-    const [sections, setSections] = useState([]); // Store all sections
-    const location = useLocation(); // Get the current location
+    const [sections, setSections] = useState([]);
+    const location = useLocation();
 
     useEffect(() => {
         const fetchOffice = async () => {
@@ -64,43 +64,23 @@ const OfficeSurvey = () => {
         }
     }, [officeId]);
 
-    useEffect(() => {
-        setSelectedSurveyId(surveyId);
-        setSelectedOfficeId(officeId);
-    }, [surveyId, officeId]);
-
-    useEffect(() => {
-        const fetchSurvey = async () => {
-            try {
-                const response = await axios.get(`http://localhost:5000/api/surveys/${surveyId}`);
-                setSurvey(response.data); // Store full survey data
-                setSections(response.data.sections || []); // Store all sections
-            } catch (err) {
-                console.error("Error fetching survey:", err);
-                setError("Failed to load survey");
-            } finally {
-                setLoading(false);
-            }
-        };
-    
-        fetchSurvey();
-    }, [surveyId]); // Re-run when surveyId changes
-
     const fetchServices = async () => {
         try {
             const response = await fetch(`http://localhost:5000/api/offices/${officeId}/services`);
             const data = await response.json();
-            setServiceType(data); // Store fetched services
+            const activeServices = data.filter(service => service.status === true);
+            setServiceType(activeServices);
         } catch (error) {
             console.error("Error fetching services:", error);
         }
     };
-  
+
     const fetchPersonnel = async () => {
         try {
             const response = await fetch(`http://localhost:5000/api/offices/${officeId}/personnel`);
             const data = await response.json();
-            setPersonnelList(data); // Store fetched personnel list
+            const activePersonnel = data.filter(person => person.status === true);
+            setPersonnelList(activePersonnel);
         } catch (error) {
             console.error("Error fetching personnel:", error);
         }
