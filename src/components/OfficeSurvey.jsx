@@ -42,6 +42,29 @@ const OfficeSurvey = () => {
     const [sections, setSections] = useState([]);
     const location = useLocation();
 
+    
+    useEffect(() => {
+        setSelectedSurveyId(surveyId);
+        setSelectedOfficeId(officeId);
+    }, [surveyId, officeId]);
+
+    useEffect(() => {
+        const fetchSurvey = async () => {
+            try {
+                const response = await axios.get(`http://localhost:5000/api/surveys/${surveyId}`);
+                setSurvey(response.data); // Store full survey data
+                setSections(response.data.sections || []); // Store all sections
+            } catch (err) {
+                console.error("Error fetching survey:", err);
+                setError("Failed to load survey");
+            } finally {
+                setLoading(false);
+            }
+        };
+    
+        fetchSurvey();
+    }, [surveyId]); // Re-run when surveyId changes
+
     useEffect(() => {
         const fetchOffice = async () => {
             try {
@@ -166,19 +189,14 @@ const OfficeSurvey = () => {
             }
         });
     };
-
-    const handleCheckboxChange = (e) => {
-        const { value, checked } = e.target;
-        setSelectedPersonnel((prevSelected) =>
-            checked
-                ? [...prevSelected, value] // Add to array if checked
-                : prevSelected.filter((person) => person !== value) // Remove if unchecked
-        );
-    };
+    
 
     const handleSubmit = async () => {
-        
-        
+        const serviceToSubmit = otherServiceType ? otherServiceType : selectedService;
+    
+        // Ensure selectedPersonnel is an array, default to an empty array if undefined or null
+        const personnelToSubmit = Array.isArray(selectedPersonnel) ? selectedPersonnel : [];
+    
         console.log("Submitting with these answers:", {
             survey_id: selectedSurveyId,
             office_id: selectedOfficeId,
@@ -190,7 +208,12 @@ const OfficeSurvey = () => {
             email: email,
             phone: phone,
             comment: comment,
-            answers: selectedAnswers.map(answer => ({ questionId: answer.questionId, answer: answer.value })),
+            selected_service: serviceToSubmit,
+            selected_personnel: personnelToSubmit, // Ensure this is always an array
+            answers: selectedAnswers.map(answer => ({
+                questionId: answer.questionId,
+                answer: answer.value
+            })),
         });
     
         try {
@@ -205,17 +228,38 @@ const OfficeSurvey = () => {
                 email: email,
                 phone: phone,
                 comment: comment,
+                selected_service: serviceToSubmit,
+                selected_personnel: personnelToSubmit, // Send the validated array
                 answers: selectedAnswers,
             });
     
             console.log("Response Data:", response);
-            const id = response.data.response_id; // Adjust based on your actual response structure
+            const id = response.data.response_id;
             setResponseId(id);
-            setIsSuccessModalOpen(true); // Open the success modal
-            setIsModalOpen(false); // Close the previous modal
+            setIsSuccessModalOpen(true);
+            setIsModalOpen(false);
         } catch (error) {
             console.error("Error submitting survey response:", error.response?.data || error.message);
             alert("Failed to submit survey response.");
+        }
+    };
+    
+    const handleCheckboxChange = (e) => {
+        const value = e.target.value;
+        if (value === "unspecified") {
+            if (e.target.checked) {
+                setSelectedPersonnel(["unspecified"]);
+            } else {
+                setSelectedPersonnel([]);
+            }
+        } else {
+            let updatedPersonnel = [...selectedPersonnel].filter((v) => v !== "unspecified");
+            if (e.target.checked) {
+                updatedPersonnel.push(parseInt(value)); // Store ID as number
+            } else {
+                updatedPersonnel = updatedPersonnel.filter((id) => id !== parseInt(value));
+            }
+            setSelectedPersonnel(updatedPersonnel);
         }
     };
 
@@ -462,7 +506,7 @@ const OfficeSurvey = () => {
                                             name="serviceType"
                                             value={service.name}
                                             checked={selectedService === service.name}
-                                            onChange={(e) => setSelectedService(e.target.value)}
+                                            onChange={(e) => setSelectedService(e.target.value)} // Update selected service
                                         />
                                         {service.name}
                                     </label>
@@ -473,34 +517,49 @@ const OfficeSurvey = () => {
                                         name="serviceType" 
                                         value="Other" 
                                         checked={selectedService === "Other"}
-                                        onChange={(e) => setSelectedService(e.target.value)}
+                                        onChange={(e) => setSelectedService(e.target.value)} // Update selected service to "Other"
                                     />
                                     Other
-                                    <input 
-                                        type="text" 
-                                        className="other-textfield"
-                                        placeholder="Please specify"
-                                        value={otherServiceType}
-                                        onChange={(e) => setOtherServicesType(e.target.value)}
-                                    />
+                                    {selectedService === "Other" && ( // Only show the text input if "Other" is selected
+                                        <input 
+                                            type="text" 
+                                            className="other-textfield"
+                                            placeholder="Please specify"
+                                            value={otherServiceType}
+                                            onChange={(e) => setOtherServicesType(e.target.value)} // Update other service input
+                                        />
+                                    )}
                                 </label>
                             </div>
                         </div>
+
                         <div className="instruction-1">
                             <p>Personnel you transacted with:</p>
                             <div className={`checkbox-group ${validationErrors.selectedPersonnel ? "input-error" : ""}`}>
                                 {personnelList.map((person) => (
-                                    <label key={person.id} className="checkbox-label">
-                                        <input
-                                            type="checkbox"
-                                            name="personnel"
-                                            value={person.name}
-                                            checked={selectedPersonnel.includes(person.name)}
-                                            onChange={handleCheckboxChange}
-                                        />
-                                        {person.name}
-                                    </label>
+                                <label key={person.id} className="checkbox-label">
+                                    <input
+                                    type="checkbox"
+                                    name="personnel"
+                                    value={person.id}
+                                    checked={selectedPersonnel.includes(person.id)}
+                                    disabled={selectedPersonnel.includes("unspecified")}
+                                    onChange={handleCheckboxChange}
+                                    />
+                                    {person.name}
+                                </label>
                                 ))}
+
+                                <label className="checkbox-label">
+                                <input
+                                    type="checkbox"
+                                    name="personnel"
+                                    value="unspecified"
+                                    checked={selectedPersonnel.includes("unspecified")}
+                                    onChange={handleCheckboxChange}
+                                />
+                                Cannot Specify
+                                </label>
                             </div>
                         </div>
                     </div>

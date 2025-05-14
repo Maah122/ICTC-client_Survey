@@ -11,11 +11,27 @@ const getResponsesBySurvey = async (surveyId) => {
     return result.rows;
 };
 
-// Insert response into the response table and return the inserted ID
-const insertResponse = async (survey_id, office_id, type, role, sex, age, region, comment, email, phone) => {
+const insertSelectedPersonnel = async (responseId, selectedPersonnel) => {
     const query = `
-        INSERT INTO "CSS".response (survey_id, office_id, type, role, sex, age, region, comment, email, phone)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        INSERT INTO "CSS".selected_personnel (response_id, personnel_id)
+        VALUES ($1, $2)
+    `;
+    for (const personnelId of selectedPersonnel) {
+        try {
+            console.log(`Inserting personnelId ${personnelId} for responseId ${responseId}`);
+            await pool.query(query, [responseId, personnelId]);
+        } catch (error) {
+            console.error(`Failed to insert personnelId ${personnelId}:`, error.message);
+        }
+    }
+};
+
+
+// Insert response into the response table and return the inserted ID
+const insertResponse = async (survey_id, office_id, type, role, sex, age, region, comment, email, phone, selected_service) => {
+    const query = `
+        INSERT INTO "CSS".response (survey_id, office_id, type, role, sex, age, region, comment, email, phone, selected_service)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         RETURNING id;
     `;
     const values = [
@@ -28,7 +44,8 @@ const insertResponse = async (survey_id, office_id, type, role, sex, age, region
         region,
         comment,  // Include the comment in the values array
         email ? email : null, // Insert null if email is an empty string
-        phone ? phone : null   // Insert null if phone is an empty string
+        phone ? phone : null, // Insert null if phone is an empty string
+        selected_service ? selected_service : null // Store the selected service or "Other"
     ];
     const result = await pool.query(query, values);
     return result.rows[0].id;
@@ -67,6 +84,7 @@ const getResponsesByOfficeAndSurvey = async (officeId, surveyId) => {
 
 module.exports = {
     getResponsesBySurvey,
+    insertSelectedPersonnel,
     insertResponse,
     insertAnswers,
     getResponsesByOfficeAndSurvey
