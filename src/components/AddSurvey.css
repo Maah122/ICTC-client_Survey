@@ -1,0 +1,79 @@
+.survey-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.survey-header h2 {
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.survey-header div {
+  display: flex;
+  gap: 10px;
+}
+
+/* Default button styling */
+.survey-header button {
+  background-color: #870d0d;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.survey-header button:hover {
+  background-color: #a30f0f;
+}
+
+/* Tablets (max-width: 600px) */
+@media (max-width: 600px) {
+  .survey-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .survey-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .survey-header div {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .survey-header button {
+    width: 100%;
+    font-size: 0.95rem;
+  }
+}
+
+/* Small Devices (max-width: 480px) */
+@media (max-width: 480px) {
+  .survey-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .survey-header button {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+}
+
+/* Extra Small Screens (max-width: 330px) */
+@media (max-width: 330px) {
+  .survey-header h2 {
+    font-size: 1rem;
+  }
+
+  .survey-header button {
+    font-size: 0.85rem;
+    padding: 6px;
+  }
+}
