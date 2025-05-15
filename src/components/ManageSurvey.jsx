@@ -160,41 +160,42 @@ const deleteSurvey = async (surveyId) => {
               </tr>
             </thead>
             <tbody>
-              {currentSurveys.map((survey) => (
-                <tr key={survey.id}>
-                  <td>{survey.id}</td>
-                  <td>{survey.title.length > 50 ? survey.title.substring(0, 70) + "..." : survey.title}</td>
-                  <td>
-                    <label className="switch">
-                      <input
-                        type="checkbox"
-                        checked={survey.status}
-                        onChange={() => handleStatusChange(survey.id, survey.status)}
-                        disabled={activeSurveyId !== null && activeSurveyId !== survey.id} // Disable if another survey is active
-                      />
-                      <span className="slider round"></span>
-                    </label>
-                  </td>
-                  <td>
-                      <i
-                      id="edit-btn"
-                      className="bi bi-pencil-square"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => {
-                        console.log("Editing survey:", survey); // Debugging log
-                        navigate(`/edit-survey?surveyId=${survey.id}`); // Pass surveyId as a query parameter
-                      }}
-                    />
-                    <i 
-                      id="edit-btn" 
-                      className="bi bi-trash" 
-                      style={{ cursor: 'pointer', marginRight: '' }} 
-                      onClick={() => deleteSurvey(survey.id)}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+  {currentSurveys.map((survey, index) => (
+    <tr key={survey.id}>
+      <td>{(currentPage - 1) * surveysPerPage + index + 1}</td>
+      <td>{survey.title.length > 50 ? survey.title.substring(0, 70) + "..." : survey.title}</td>
+      <td>
+        <label className="switch">
+          <input
+            type="checkbox"
+            checked={survey.status}
+            onChange={() => handleStatusChange(survey.id, survey.status)}
+            disabled={activeSurveyId !== null && activeSurveyId !== survey.id}
+          />
+          <span className="slider round"></span>
+        </label>
+      </td>
+      <td>
+        <i
+          id="edit-btn"
+          className="bi bi-pencil-square"
+          style={{ cursor: "pointer" }}
+          onClick={() => {
+            console.log("Editing survey:", survey);
+            navigate(`/edit-survey?surveyId=${survey.id}`);
+          }}
+        />
+        <i
+          id="edit-btn"
+          className="bi bi-trash"
+          style={{ cursor: "pointer" }}
+          onClick={() => deleteSurvey(survey.id)}
+        />
+      </td>
+    </tr>
+  ))}
+</tbody>
+
           </table>
           <nav>
             <ul className="pagination justify-content-center">

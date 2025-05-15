@@ -12,7 +12,7 @@ const ManageOffice = () => {
   const [offices, setOffices] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const officesPerPage = 20;
+  const officesPerPage = 10;
   const navigate = useNavigate();
 
   // Get token from localStorage and decode it
@@ -140,43 +140,45 @@ const ManageOffice = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentOffices.map((office) => (
-                  <React.Fragment key={office.id}>
-                    <tr>
-                      <td>{office.id}</td>
-                      <td>{office.office_code ? office.office_code : "No Code"}</td>
-                      <td>{office.name}</td>
-                      {isAdmin && (
-                        <td>
-                          <label className="switch">
-                          <input
-                            type="checkbox"
-                            checked={office.status}
-                            onChange={() => handleToggleStatus(office.id, office.status)}
-                          />
-
-                            <span className="slider round"></span>
-                          </label>
-                        </td>
-                      )}
-                      <td>
-                        <i
-                          className="bi bi-pencil-square"
-                          style={{ cursor: "pointer", marginRight: "10px" }}
-                          onClick={() => goToEditOfficePage(office)}
-                        />
-                        {isAdmin && (
-                          <i
-                            className="bi bi-trash"
-                            style={{ cursor: "pointer" }}
-                            onClick={() => deleteOffice(office.id)}
-                          />
-                        )}
-                      </td>
-                    </tr>
-                  </React.Fragment>
-                ))}
-              </tbody>
+                    {currentOffices.map((office) => {
+                      const globalIndex = filteredOffices.findIndex((o) => o.id === office.id);
+                      return (
+                        <React.Fragment key={office.id}>
+                          <tr>
+                            <td>{globalIndex + 1}</td>
+                            <td>{office.office_code ? office.office_code : "No Code"}</td>
+                            <td>{office.name}</td>
+                            {isAdmin && (
+                              <td>
+                                <label className="switch">
+                                  <input
+                                    type="checkbox"
+                                    checked={office.status}
+                                    onChange={() => handleToggleStatus(office.id, office.status)}
+                                  />
+                                  <span className="slider round"></span>
+                                </label>
+                              </td>
+                            )}
+                            <td>
+                              <i
+                                className="bi bi-pencil-square"
+                                style={{ cursor: "pointer", marginRight: "10px" }}
+                                onClick={() => goToEditOfficePage(office)}
+                              />
+                              {isAdmin && (
+                                <i
+                                  className="bi bi-trash"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => deleteOffice(office.id)}
+                                />
+                              )}
+                            </td>
+                          </tr>
+                        </React.Fragment>
+                      );
+                    })}
+                  </tbody>
             </table>
           </div>
 
